@@ -1,0 +1,895 @@
+/*
+ * dhcpcd-gtk
+ * Copyright 2009-2014 Roy Marples <roy@marples.name>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#include <errno.h>
+#include <locale.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifdef NOTIFY
+#  include <libnotify/notify.h>
+#ifndef NOTIFY_CHECK_VERSION
+#  define NOTIFY_CHECK_VERSION(a,b,c) 0
+#endif
+static NotifyNotification *nn;
+#endif
+
+#include "config.h"
+#include "dhcpcd.h"
+#include "dhcpcd-gtk.h"
+
+#include "plugin.h"
+
+#define ICON_BUTTON_TRIM 4
+
+
+
+//struct watch {
+//	gpointer ref;
+//	int fd;
+//	guint eventid;
+//	GIOChannel *gio;
+//	struct watch *next;
+//};
+//static struct watch *watches;
+
+static gboolean dhcpcd_try_open(gpointer data);
+static gboolean dhcpcd_wpa_try_open(gpointer data);
+
+WI_SCAN *
+wi_scan_find(DHCPCD_WI_SCAN *scan, GtkWidget *p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
+	WI_SCAN *w;
+	DHCPCD_WI_SCAN *dw;
+
+	TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
+		for (dw = w->scans; dw; dw = dw->next)
+			if (dw == scan)
+				return w;
+	}
+	return NULL;
+}
+
+const char *
+get_strength_icon_name(int strength)
+{
+
+	if (strength > 80)
+		return "network-wireless-connected-100";
+	else if (strength > 55)
+		return "network-wireless-connected-75";
+	else if (strength > 30)
+		return "network-wireless-connected-50";
+	else if (strength > 5)
+		return "network-wireless-connected-25";
+	else
+		return "network-wireless-connected-00";
+}
+
+static DHCPCD_WI_SCAN *
+get_strongest_scan(GtkWidget *p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
+	WI_SCAN *w;
+	DHCPCD_WI_SCAN *scan, *s;
+
+	scan = NULL;
+	TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
+		for (s = w->scans; s; s = s->next) {
+			if (dhcpcd_wi_associated(w->interface, s) &&
+			    (scan == NULL ||
+			    s->strength.value > scan->strength.value))
+				scan = s;
+		}
+	}
+	return scan;
+}
+
+static gboolean
+animate_carrier(gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data((GtkWidget *) p);
+	const char *icon;
+	DHCPCD_WI_SCAN *scan;
+
+	if (dhcp->ani_timer == 0)
+		return false;
+
+	scan = get_strongest_scan(p);
+	if (scan) {
+		switch(dhcp->ani_counter++) {
+		case 0:
+			icon = "network-wireless-connected-00";
+			break;
+		case 1:
+			icon = "network-wireless-connected-25";
+			break;
+		case 2:
+			icon = "network-wireless-connected-50";
+			break;
+		case 3:
+			icon = "network-wireless-connected-75";
+			break;
+		default:
+			icon = "network-wireless-connected-100";
+			dhcp->ani_counter = 0;
+		}
+
+	} else {
+		switch(dhcp->ani_counter++) {
+		case 0:
+			icon = "network-transmit";
+			break;
+		case 1:
+			icon = "network-receive";
+			break;
+		default:
+			icon = "network-idle";
+			dhcp->ani_counter = 0;
+			break;
+		}
+	}
+    GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
+	//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+	return true;
+}
+
+static gboolean
+animate_online(gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data((GtkWidget *) p);
+	const char *icon;
+	DHCPCD_WI_SCAN *scan;
+
+	if (dhcp->ani_timer == 0)
+		return false;
+
+	if (dhcp->ani_counter++ > 6) {
+		dhcp->ani_timer = 0;
+		dhcp->ani_counter = 0;
+		return false;
+	}
+
+	scan = get_strongest_scan(p);
+	if (dhcp->ani_counter % 2 == 0)
+		icon = scan ? "network-wireless-connected-00" :
+		    "network-idle";
+	else
+		icon = scan ? get_strength_icon_name(scan->strength.value) :
+		    "network-transmit-receive";
+    GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
+	//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+	return true;
+}
+
+static void
+update_online(DHCPCD_CONNECTION *con, bool showif, gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data((GtkWidget *) p);
+	bool ison, iscarrier;
+	char *msg, *msgs, *tmp;
+	DHCPCD_IF *ifs, *i;
+
+	ison = iscarrier = false;
+	msgs = NULL;
+	ifs = dhcpcd_interfaces(con);
+	for (i = ifs; i; i = i->next) {
+		if (g_strcmp0(i->type, "link") == 0) {
+			if (i->up)
+				iscarrier = true;
+		} else {
+			if (i->up)
+				ison = true;
+		}
+		msg = dhcpcd_if_message(i, NULL);
+		if (msg) {
+			if (showif)
+				g_message("%s", msg);
+			if (msgs) {
+				tmp = g_strconcat(msgs, "\n", msg, NULL);
+				g_free(msgs);
+				g_free(msg);
+				msgs = tmp;
+			} else
+				msgs = msg;
+		} else if (showif)
+			g_message("%s: %s", i->ifname, i->reason);
+	}
+
+//	if (online != ison || carrier != iscarrier) {
+		dhcp->online = ison;
+		dhcp->carrier = iscarrier;
+		if (dhcp->ani_timer != 0) {
+			g_source_remove(dhcp->ani_timer);
+			dhcp->ani_timer = 0;
+			dhcp->ani_counter = 0;
+		}
+		if (ison) {
+			animate_online(p);
+			dhcp->ani_timer = g_timeout_add(300, animate_online, p);
+		} else if (iscarrier) {
+			animate_carrier(p);
+			dhcp->ani_timer = g_timeout_add(500, animate_carrier, p);
+		} else {
+    GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
+			//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon),
+			//    "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+		}
+//	}
+	gtk_widget_set_tooltip_text(dhcp->tray_icon, msgs);
+	g_free(msgs);
+}
+
+void
+notify_close(void)
+{
+#ifdef NOTIFY
+	if (nn != NULL)
+		notify_notification_close(nn, NULL);
+#endif
+}
+
+#ifdef NOTIFY
+static char *notify_last_msg;
+
+static void
+notify_closed(void)
+{
+	nn = NULL;
+}
+
+static void
+notify(const char *title, const char *msg, const char *icon)
+{
+
+	if (msg == NULL)
+		return;
+	/* Don't spam the same message */
+	if (notify_last_msg) {
+		if (notify_last_msg && strcmp(msg, notify_last_msg) == 0)
+			return;
+		g_free(notify_last_msg);
+	}
+	notify_last_msg = g_strdup(msg);
+
+	if (nn != NULL)
+		notify_notification_close(nn, NULL);
+
+#if NOTIFY_CHECK_VERSION(0,7,0)
+	nn = notify_notification_new(title, msg, icon);
+	notify_notification_set_hint(nn, "transient",
+	    g_variant_new_boolean(TRUE));
+#else
+	if (gtk_status_icon_get_visible(status_icon))
+		nn = notify_notification_new_with_status_icon(title,
+		    msg, icon, status_icon);
+	else
+		nn = notify_notification_new(title, msg, icon, NULL);
+#endif
+
+	notify_notification_set_timeout(nn, 5000);
+	g_signal_connect(nn, "closed", G_CALLBACK(notify_closed), NULL);
+	notify_notification_show(nn, NULL);
+}
+#else
+#  define notify(a, b, c)
+#endif
+
+static struct watch *
+dhcpcd_findwatch(int fd, gpointer data, struct watch **last, struct watch *watches)
+{
+	struct watch *w;
+
+	if (last)
+		*last = NULL;
+	for (w = watches; w; w = w->next) {
+		if (w->fd == fd || w->ref == data)
+			return w;
+		if (last)
+			*last = w;
+	}
+	return NULL;
+}
+
+static void
+dhcpcd_unwatch(int fd, gpointer data, struct watch **watches)
+{
+	struct watch *w, *l;
+
+	if ((w = dhcpcd_findwatch(fd, data, &l, *watches))) {
+		if (l)
+			l->next = w->next;
+		else
+			*watches = w->next;
+		g_source_remove(w->eventid);
+		g_io_channel_unref(w->gio);
+		g_free(w);
+	}
+}
+
+static gboolean
+dhcpcd_watch(int fd,
+    gboolean (*cb)(GIOChannel *, GIOCondition, gpointer),
+    gpointer data, struct watch **watches)
+{
+	struct watch *w, *l;
+	GIOChannel *gio;
+	GIOCondition flags;
+	guint eventid;
+
+	/* Sanity */
+	if ((w = dhcpcd_findwatch(fd, data, &l, *watches))) {
+		if (w->fd == fd)
+			return TRUE;
+		if (l)
+			l->next = w->next;
+		else
+			*watches = w->next;
+		g_source_remove(w->eventid);
+		g_io_channel_unref(w->gio);
+		g_free(w);
+	}
+
+	gio = g_io_channel_unix_new(fd);
+	if (gio == NULL) {
+		g_warning(_("Error creating new GIO Channel\n"));
+		return FALSE;
+	}
+	flags = G_IO_IN | G_IO_ERR | G_IO_HUP;
+	if ((eventid = g_io_add_watch(gio, flags, cb, data)) == 0) {
+		g_warning(_("Error creating watch\n"));
+		g_io_channel_unref(gio);
+		return FALSE;
+	}
+
+	w = g_try_malloc(sizeof(*w));
+	if (w == NULL) {
+		g_warning(_("g_try_malloc\n"));
+		g_source_remove(eventid);
+		g_io_channel_unref(gio);
+		return FALSE;
+	}
+
+	w->ref = data;
+	w->fd = fd;
+	w->eventid = eventid;
+	w->gio = gio;
+	w->next = *watches;
+	*watches = w;
+
+	return TRUE;
+}
+
+static void
+dhcpcd_status_cb(DHCPCD_CONNECTION *con, const char *status,
+     gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) p;
+	static char *last = NULL;
+	const char *msg;
+	bool refresh;
+	WI_SCAN *w;
+
+	g_message("Status changed to %s", status);
+	if (g_strcmp0(status, "down") == 0) {
+		msg = N_(last ?
+		    "Connection to dhcpcd lost" : "dhcpcd not running");
+		if (dhcp->ani_timer != 0) {
+			g_source_remove(dhcp->ani_timer);
+			dhcp->ani_timer = 0;
+			dhcp->ani_counter = 0;
+		}
+		dhcp->online = dhcp->carrier = false;
+    	GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    	gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
+		//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon),
+		//    "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+		gtk_widget_set_tooltip_text(dhcp->tray_icon, msg);
+		prefs_abort(dhcp);
+		menu_abort(dhcp);
+		wpa_abort(dhcp);
+		while ((w = TAILQ_FIRST(&dhcp->wi_scans))) {
+			TAILQ_REMOVE(&dhcp->wi_scans, w, next);
+			dhcpcd_wi_scans_free(w->scans);
+			g_free(w);
+		}
+		dhcpcd_unwatch(-1, con, &dhcp->watches);
+		if (!dhcp->reopen_timer)
+			dhcp->reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
+	} else {
+		if ((last == NULL || g_strcmp0(last, "down") == 0)) {
+			g_message(_("Connected to %s-%s"), "dhcpcd",
+			    dhcpcd_version(con));
+			refresh = true;
+		} else
+			refresh = g_strcmp0(last, "opened") ? false : true;
+		update_online(con, refresh, dhcp->plugin);
+	}
+
+	g_free(last);
+	last = g_strdup(status);
+}
+
+static gboolean
+dhcpcd_cb(_unused GIOChannel *gio, _unused GIOCondition c, gpointer data)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) data;
+	DHCPCD_CONNECTION *con = dhcp->con;
+
+	if (dhcpcd_get_fd(con) == -1) {
+		g_warning(_("dhcpcd connection lost"));
+		dhcpcd_unwatch(-1, con, &dhcp->watches);
+		if (!dhcp->reopen_timer) 
+			dhcp->reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_try_open, data);
+		return FALSE;
+	}
+
+	dhcpcd_dispatch(con);
+	return TRUE;
+}
+
+static gboolean
+dhcpcd_try_open(gpointer data)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) data;
+	DHCPCD_CONNECTION *con = dhcp->con;
+	int fd;
+	static int last_error;
+
+	fd = dhcpcd_open(con, true);
+	if (fd == -1) {
+		if (errno == EACCES || errno == EPERM) {
+			if ((fd = dhcpcd_open(con, false)) != -1)
+				goto unprived;
+		}
+		if (errno != last_error) {
+			g_critical("dhcpcd_open: %s", strerror(errno));
+			last_error = errno;
+		}
+		return TRUE;
+	}
+
+unprived:
+	if (!dhcpcd_watch(fd, dhcpcd_cb, data, &dhcp->watches)) {
+		dhcpcd_close(con);
+		return TRUE;
+	}
+
+	/* Start listening to WPA events */
+	dhcpcd_wpa_start(con);
+	dhcp->reopen_timer = 0;
+
+	return FALSE;
+}
+
+static void
+dhcpcd_if_cb(DHCPCD_IF *i, gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) p;
+	DHCPCD_CONNECTION *con;
+	char *msg;
+	//const char *icon;
+	bool new_msg;
+
+	/* We should ignore renew and stop so we don't annoy the user */
+	if (g_strcmp0(i->reason, "RENEW") &&
+	    g_strcmp0(i->reason, "STOP") &&
+	    g_strcmp0(i->reason, "STOPPED"))
+	{
+		msg = dhcpcd_if_message(i, &new_msg);
+		if (msg) {
+			g_message("%s", msg);
+#ifdef NOTIFY
+			if (new_msg) {
+				if (i->up)
+					icon = "network-transmit-receive";
+				//else
+				//	icon = "network-transmit";
+				if (!i->up)
+					icon = "network-offline";
+				notify(_("Network event"), msg, icon);
+			}
+#endif
+			g_free(msg);
+		}
+	}
+
+	/* Update the tooltip with connection information */
+	con = dhcpcd_if_connection(i);
+	update_online(con, false, dhcp->plugin);
+
+	if (i->wireless) {
+		DHCPCD_WI_SCAN *scans;
+		WI_SCAN *w;
+
+		TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
+			if (w->interface == i)
+				break;
+		}
+		if (w) {
+			scans = dhcpcd_wi_scans(i);
+			menu_update_scans(w, scans, dhcp->plugin);
+		}
+	}
+}
+
+static gboolean
+dhcpcd_wpa_cb(_unused GIOChannel *gio, _unused GIOCondition c,
+    gpointer data)
+{
+	DHCPCD_WPA *wpa = (DHCPCD_WPA *)data;
+	DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) dhcpcd_wpa_get_context (wpa);
+	DHCPCD_IF *i;
+	
+	if (dhcpcd_wpa_get_fd(wpa) == -1) {
+		dhcpcd_unwatch(-1, wpa, &dhcp->watches);
+
+		/* If the interface hasn't left, try re-opening */
+		i = dhcpcd_wpa_if(wpa);
+		if (i == NULL ||
+		    g_strcmp0(i->reason, "DEPARTED") == 0 ||
+		    g_strcmp0(i->reason, "STOPPED") == 0)
+			return TRUE;
+		g_warning(_("dhcpcd WPA connection lost: %s"), i->ifname);
+		//if (!dhcp->wpa_reopen_timer)
+		//	dhcp->wpa_reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_wpa_try_open, wpa);
+		g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_wpa_try_open, wpa);
+		return FALSE;
+	}
+
+	dhcpcd_wpa_dispatch(wpa);
+	return TRUE;
+}
+
+static gboolean
+dhcpcd_wpa_try_open(gpointer data)
+{
+	DHCPCD_WPA *wpa = (DHCPCD_WPA *)data;
+	DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) dhcpcd_wpa_get_context (wpa);
+	int fd;
+	static int last_error;
+
+	fd = dhcpcd_wpa_open(wpa);
+	if (fd == -1) {
+		if (errno != last_error)
+			g_critical("dhcpcd_wpa_open: %s", strerror(errno));
+		last_error = errno;
+		return TRUE;
+	}
+
+	if (!dhcpcd_watch(fd, dhcpcd_wpa_cb, wpa, &dhcp->watches)) {
+		dhcpcd_wpa_close(wpa);
+		return TRUE;
+	}
+	
+	//dhcp->wpa_reopen_timer = 0;
+	return FALSE;
+}
+
+static void
+dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) p;
+	DHCPCD_IF *i;
+	WI_SCAN *w;
+	DHCPCD_WI_SCAN *scans, *s1, *s2;
+	char *txt, *t;
+	int lerrno, fd;
+	const char *msg;
+
+	/* This could be a new WPA so watch it */
+	fd = dhcpcd_wpa_get_fd(wpa);
+	if (fd == -1) {
+		g_critical("No fd for WPA %p", wpa);
+		dhcpcd_unwatch(-1, wpa, &dhcp->watches);
+		return;
+	}
+	dhcpcd_wpa_set_context (wpa, p);	
+	dhcpcd_watch(fd, dhcpcd_wpa_cb, wpa, &dhcp->watches);
+
+	i = dhcpcd_wpa_if(wpa);
+	if (i == NULL) {
+		g_critical("No interface for WPA %p", wpa);
+		return;
+	}
+	g_message(_("%s: Received scan results"), i->ifname);
+	lerrno = errno;
+	errno = 0;
+	scans = dhcpcd_wi_scans(i);
+	if (scans == NULL && errno)
+		g_warning("%s: %s", i->ifname, strerror(errno));
+	errno = lerrno;
+	TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
+		if (w->interface == i)
+			break;
+	}
+	if (w == NULL) {
+		w = g_malloc(sizeof(*w));
+		w->interface = i;
+		w->scans = scans;
+		w->ifmenu = NULL;
+		w->sep = NULL;
+		w->noap = NULL;
+		TAILQ_INIT(&w->menus);
+		TAILQ_INSERT_TAIL(&dhcp->wi_scans, w, next);
+	} else {
+		txt = NULL;
+		msg = N_("New Access Point");
+		for (s1 = scans; s1; s1 = s1->next) {
+			for (s2 = w->scans; s2; s2 = s2->next)
+				if (g_strcmp0(s1->ssid, s2->ssid) == 0)
+					break;
+			if (s2 == NULL) {
+				if (txt == NULL)
+					txt = g_strdup(s1->ssid);
+				else {
+					msg = N_("New Access Points");
+					t = g_strconcat(txt, "\n",
+					    s1->ssid, NULL);
+					g_free(txt);
+					txt = t;
+				}
+			}
+		}
+		if (txt) {
+			notify(msg, txt, "network-wireless");
+			g_free(txt);
+		}
+		menu_update_scans(w, scans, dhcp->plugin);
+	}
+
+	if (!dhcp->ani_timer) {
+		s1 = get_strongest_scan(dhcp->plugin);
+		if (s1)
+			msg = get_strength_icon_name(s1->strength.value);
+		else if (dhcp->online)
+			msg = "network-transmit-receive";
+		else
+			msg = "network-offline";
+    GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
+		//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+	}
+}
+
+static void
+dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa, const char *status, gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) p;
+	DHCPCD_IF *i;
+	WI_SCAN *w, *wn;
+	
+	i = dhcpcd_wpa_if(wpa);
+	g_message("%s: WPA status %s", i->ifname, status);
+	if (g_strcmp0(status, "down") == 0) {
+		dhcpcd_unwatch(-1, wpa, &dhcp->watches);
+		TAILQ_FOREACH_SAFE(w, &dhcp->wi_scans, next, wn) {
+			if (w->interface == i) {
+				TAILQ_REMOVE(&dhcp->wi_scans, w, next);
+				menu_remove_if(w, dhcp);
+				dhcpcd_wi_scans_free(w->scans);
+				g_free(w);
+			}
+		}
+	}
+}
+
+#ifdef BG_SCAN
+static gboolean
+bgscan(gpointer data)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) data;
+	WI_SCAN *w;
+	DHCPCD_WPA *wpa;
+	
+	TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
+		if (w->interface->wireless) {
+			wpa = dhcpcd_wpa_find(dhcp->con, w->interface->ifname);
+			if (wpa)
+				dhcpcd_wpa_scan(wpa);
+		}
+	}
+
+	return TRUE;
+}
+#endif
+
+/* Plugin destructor. */
+static void dhcpcdui_destructor(gpointer user_data)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) user_data;
+
+	wpa_abort(dhcp);
+
+ 	dhcpcd_close(dhcp->con);
+    if (dhcp->reopen_timer != 0)
+        g_source_remove(dhcp->reopen_timer);
+    //if (dhcp->wpa_reopen_timer != 0)
+    //    g_source_remove(dhcp->wpa_reopen_timer);
+    
+    /* If the menu is open, dismiss it. */
+    if (dhcp->menu != NULL)
+        gtk_widget_destroy(dhcp->menu);
+    /* Remove the timer. */
+    if (dhcp->bgscan_timer != 0)
+        g_source_remove(dhcp->bgscan_timer);
+    if (dhcp->defscan_timer != 0)
+        g_source_remove(dhcp->defscan_timer);
+    if (dhcp->ani_timer != 0)
+        g_source_remove(dhcp->ani_timer);
+        
+    //g_signal_handlers_disconnect_by_func(panel_get_icon_theme(vol->panel),
+    //                                     volumealsa_theme_change, vol);
+
+    /* Deallocate all memory. */
+	dhcpcd_free(dhcp->con);
+   	g_free(dhcp);
+}
+
+static gboolean dhcpcdui_button_press_event(GtkWidget * widget, GdkEventButton * event, LXPanel * panel)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(widget);
+
+    /* Left-click.  Show or hide the popup window. */
+    if (event->button == 1)
+    {
+    	menu_show (dhcp);
+    	return TRUE;
+    }
+    else return FALSE;
+}
+
+/* Plugin constructor. */
+static GtkWidget *dhcpcdui_constructor(LXPanel *panel, config_setting_t *settings)
+{
+    /* Allocate and initialize plugin context and set into Plugin private data pointer. */
+    DHCPCDUIPlugin * dhcp = g_new0(DHCPCDUIPlugin, 1);
+    GtkWidget *p;
+    
+    setlocale(LC_ALL, "");
+	bindtextdomain(PACKAGE, NULL);
+	bind_textdomain_codeset(PACKAGE, "UTF-8");
+	textdomain(PACKAGE);
+
+	gtk_icon_theme_append_search_path(gtk_icon_theme_get_default(),
+	    ICONDIR);
+	dhcp->tray_icon = gtk_image_new_from_icon_name("network-offline", panel_get_icon_size (panel) - ICON_BUTTON_TRIM);
+
+	gtk_widget_set_tooltip_text(dhcp->tray_icon, _("Connecting to dhcpcd ..."));
+	gtk_widget_set_visible(dhcp->tray_icon, true);
+	dhcp->online = false;
+
+	TAILQ_INIT(&dhcp->wi_scans);
+	g_message(_("Connecting ..."));
+	dhcp->con = dhcpcd_new();
+	if (dhcp->con ==  NULL) {
+		g_critical("libdhcpcd: %s", strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	dhcpcd_set_progname(dhcp->con, "dhcpcd-gtk");    
+
+    /* Allocate top level widget and set into Plugin widget pointer. */
+    dhcp->panel = panel;
+    dhcp->plugin = p = gtk_button_new();
+    gtk_button_set_relief (GTK_BUTTON (dhcp->plugin), GTK_RELIEF_NONE);
+    g_signal_connect(dhcp->plugin, "button-press-event", G_CALLBACK(dhcpcdui_button_press_event), NULL);
+    dhcp->settings = settings;
+    lxpanel_plugin_set_data(p, dhcp, dhcpcdui_destructor);
+    gtk_widget_add_events(p, GDK_BUTTON_PRESS_MASK);
+
+    /* Allocate icon as a child of top level. */
+    dhcp->tray_icon = gtk_image_new();
+    gtk_container_add(GTK_CONTAINER(p), dhcp->tray_icon);
+    
+    
+    dhcpcd_set_status_callback(dhcp->con, dhcpcd_status_cb, dhcp);
+	dhcpcd_set_if_callback(dhcp->con, dhcpcd_if_cb, dhcp);
+	dhcpcd_wpa_set_scan_callback(dhcp->con, dhcpcd_wpa_scan_cb, dhcp);
+	dhcpcd_wpa_set_status_callback(dhcp->con, dhcpcd_wpa_status_cb, dhcp);
+	if (dhcpcd_try_open(dhcp))
+		dhcp->reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
+
+	//menu_init(p, dhcp->con);
+#ifdef BG_SCAN
+	dhcp->defscan_timer = g_timeout_add(DHCPCD_WPA_SCAN_LONG, bgscan, dhcp);
+#endif
+
+    /* Update the display, show the widget, and return. */
+    //volumealsa_update_display(vol);
+    gtk_widget_show_all(p);
+    return p;
+}
+#if 0
+
+int
+main(int argc, char *argv[])
+{
+	DHCPCD_CONNECTION *con;
+
+
+	gtk_icon_theme_append_search_path(gtk_icon_theme_get_default(),
+	    ICONDIR);
+	status_icon = gtk_status_icon_new_from_icon_name("network-offline");
+
+	gtk_status_icon_set_tooltip_text(status_icon,
+	    _("Connecting to dhcpcd ..."));
+	gtk_status_icon_set_visible(status_icon, true);
+
+
+	menu_init(status_icon, con);
+
+	return 0;
+}
+
+#endif
+
+static GtkWidget *dhcpcdui_configure(LXPanel *panel, GtkWidget *p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
+    prefs_show (dhcp);
+	return NULL;
+}
+
+static void dhcpcdui_configuration_changed(LXPanel *panel, GtkWidget *p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
+	const char *msg;
+	DHCPCD_WI_SCAN *s1;
+	
+	if (!dhcp->ani_timer) 
+	{
+		s1 = get_strongest_scan(p);
+		if (s1)
+			msg = get_strength_icon_name(s1->strength.value);
+		else if (dhcp->online)
+			msg = "network-transmit-receive";
+		else
+			msg = "network-offline";
+    	GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    	gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
+		//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+	}
+}
+
+
+FM_DEFINE_MODULE(lxpanel_gtk, dhcpcdui)
+
+/* Plugin descriptor. */
+LXPanelPluginInit fm_module_init_lxpanel_gtk = {
+    .name = N_("dhcpcdui"),
+    .description = N_("Network interface for dhcpcd"),
+
+    .new_instance = dhcpcdui_constructor,
+    .config = dhcpcdui_configure,
+    .reconfigure = dhcpcdui_configuration_changed,
+    .button_press_event = dhcpcdui_button_press_event
+};
+
+
