@@ -52,6 +52,22 @@ on_quit(void)
 	gtk_main_quit();
 }
 #endif
+
+static WI_SCAN *
+wi_scan_find(DHCPCD_WI_SCAN *scan, GtkWidget *p)
+{
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
+	WI_SCAN *w;
+	DHCPCD_WI_SCAN *dw;
+
+	TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
+		for (dw = w->scans; dw; dw = dw->next)
+			if (dw == scan)
+				return w;
+	}
+	return NULL;
+}
+
 static void
 ssid_hook(GtkMenuItem *item, GtkWidget *p)
 {
@@ -201,6 +217,7 @@ menu_update_scans(WI_SCAN *wi, DHCPCD_WI_SCAN *scans, GtkWidget *p)
 {
 	WI_MENU *wim, *win;
 	DHCPCD_WI_SCAN *s;
+	gboolean separate = FALSE;
 
 	if (wi->ifmenu == NULL) {
 		dhcpcd_wi_scans_free(wi->scans);
@@ -229,9 +246,7 @@ menu_update_scans(WI_SCAN *wi, DHCPCD_WI_SCAN *scans, GtkWidget *p)
 			TAILQ_INSERT_TAIL (&wi->menus, wim, next);
 			gtk_menu_shell_append (GTK_MENU_SHELL (wi->ifmenu), wim->menu);
 			gtk_widget_show_all (wim->menu);
-			wi->sep = gtk_separator_menu_item_new ();
-			gtk_widget_show (wi->sep);
-			gtk_menu_shell_append (GTK_MENU_SHELL (wi->ifmenu), wi->sep);
+			separate = TRUE;
 		}
 	}
 
@@ -242,6 +257,13 @@ menu_update_scans(WI_SCAN *wi, DHCPCD_WI_SCAN *scans, GtkWidget *p)
 		{
 			wim = create_menu (wi, s, p);
 			TAILQ_INSERT_TAIL (&wi->menus, wim, next);
+			if (separate)
+			{
+				wi->sep = gtk_separator_menu_item_new ();
+				gtk_widget_show (wi->sep);
+				gtk_menu_shell_append (GTK_MENU_SHELL (wi->ifmenu), wi->sep);
+				separate = FALSE;
+			}
 			gtk_menu_shell_append (GTK_MENU_SHELL (wi->ifmenu), wim->menu);
 			gtk_widget_show_all (wim->menu);
 		}
@@ -282,6 +304,7 @@ add_scans(WI_SCAN *wi, GtkWidget *p)
 	GtkWidget *m;
 	DHCPCD_WI_SCAN *wis;
 	WI_MENU *wim;
+	gboolean separate = FALSE;
 
 	wi->noap = NULL;
 
@@ -303,9 +326,7 @@ add_scans(WI_SCAN *wi, GtkWidget *p)
 			wim = create_menu (wi, wis, p);
 			TAILQ_INSERT_TAIL (&wi->menus, wim, next);
 			gtk_menu_shell_append (GTK_MENU_SHELL (m), wim->menu);
-			wi->sep = gtk_separator_menu_item_new ();
-			gtk_widget_show (wi->sep);
-			gtk_menu_shell_append (GTK_MENU_SHELL (m), wi->sep);
+			separate = TRUE;
 		}
 	}
 	for (wis = wi->scans; wis; wis = wis->next)
@@ -314,6 +335,13 @@ add_scans(WI_SCAN *wi, GtkWidget *p)
 		{
 			wim = create_menu (wi, wis, p);
 			TAILQ_INSERT_TAIL (&wi->menus, wim, next);
+			if (separate)
+			{
+				wi->sep = gtk_separator_menu_item_new ();
+				gtk_widget_show (wi->sep);
+				gtk_menu_shell_append (GTK_MENU_SHELL (m), wi->sep);
+				separate = FALSE;
+			}
 			gtk_menu_shell_append (GTK_MENU_SHELL (m), wim->menu);
 		}
 	}

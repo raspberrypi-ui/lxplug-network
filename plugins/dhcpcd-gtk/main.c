@@ -45,34 +45,8 @@ static NotifyNotification *nn;
 
 #define ICON_BUTTON_TRIM 4
 
-
-
-//struct watch {
-//	gpointer ref;
-//	int fd;
-//	guint eventid;
-//	GIOChannel *gio;
-//	struct watch *next;
-//};
-//static struct watch *watches;
-
 static gboolean dhcpcd_try_open(gpointer data);
 static gboolean dhcpcd_wpa_try_open(gpointer data);
-
-WI_SCAN *
-wi_scan_find(DHCPCD_WI_SCAN *scan, GtkWidget *p)
-{
-    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
-	WI_SCAN *w;
-	DHCPCD_WI_SCAN *dw;
-
-	TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
-		for (dw = w->scans; dw; dw = dw->next)
-			if (dw == scan)
-				return w;
-	}
-	return NULL;
-}
 
 const char *
 get_strength_icon_name(int strength)
@@ -155,7 +129,6 @@ animate_carrier(gpointer p)
 	}
     GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
     gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
-	//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
 	return true;
 }
 
@@ -184,7 +157,6 @@ animate_online(gpointer p)
 		    "network-transmit-receive";
     GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
     gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
-	//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
 	return true;
 }
 
@@ -237,10 +209,8 @@ update_online(DHCPCD_CONNECTION *con, bool showif, gpointer p)
 			animate_carrier(p);
 			dhcp->ani_timer = g_timeout_add(500, animate_carrier, p);
 		} else {
-    GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
-			//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon),
-			//    "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+    		GdkPixbuf *pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    		gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
 		}
 //	}
 	gtk_widget_set_tooltip_text(dhcp->tray_icon, msgs);
@@ -409,8 +379,6 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con, const char *status,
 		dhcp->online = dhcp->carrier = false;
     	GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
     	gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
-		//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon),
-		//    "network-offline", panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
 		gtk_widget_set_tooltip_text(dhcp->tray_icon, msg);
 		prefs_abort(dhcp);
 		menu_abort(dhcp);
@@ -558,9 +526,9 @@ dhcpcd_wpa_cb(_unused GIOChannel *gio, _unused GIOCondition c,
 		    g_strcmp0(i->reason, "STOPPED") == 0)
 			return TRUE;
 		g_warning(_("dhcpcd WPA connection lost: %s"), i->ifname);
-		//if (!dhcp->wpa_reopen_timer)
-		//	dhcp->wpa_reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_wpa_try_open, wpa);
-		g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_wpa_try_open, wpa);
+		if (!dhcp->wpa_reopen_timer)
+			dhcp->wpa_reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_wpa_try_open, wpa);
+		//g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_wpa_try_open, wpa);
 		return FALSE;
 	}
 
@@ -589,7 +557,7 @@ dhcpcd_wpa_try_open(gpointer data)
 		return TRUE;
 	}
 	
-	//dhcp->wpa_reopen_timer = 0;
+	dhcp->wpa_reopen_timer = 0;
 	return FALSE;
 }
 
@@ -673,9 +641,8 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, gpointer p)
 			msg = "network-transmit-receive";
 		else
 			msg = "network-offline";
-    GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
-    gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
-		//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+    	GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    	gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
 	}
 }
 
@@ -721,43 +688,11 @@ bgscan(gpointer data)
 }
 #endif
 
-/* Plugin destructor. */
-static void dhcpcdui_destructor(gpointer user_data)
+static gboolean dhcpcdui_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
 {
-    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) user_data;
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (widget);
 
-	wpa_abort(dhcp);
-
- 	dhcpcd_close(dhcp->con);
-    if (dhcp->reopen_timer != 0)
-        g_source_remove(dhcp->reopen_timer);
-    //if (dhcp->wpa_reopen_timer != 0)
-    //    g_source_remove(dhcp->wpa_reopen_timer);
-    
-    /* If the menu is open, dismiss it. */
-    if (dhcp->menu != NULL)
-        gtk_widget_destroy(dhcp->menu);
-    /* Remove the timer. */
-    if (dhcp->bgscan_timer != 0)
-        g_source_remove(dhcp->bgscan_timer);
-    if (dhcp->defscan_timer != 0)
-        g_source_remove(dhcp->defscan_timer);
-    if (dhcp->ani_timer != 0)
-        g_source_remove(dhcp->ani_timer);
-        
-    //g_signal_handlers_disconnect_by_func(panel_get_icon_theme(vol->panel),
-    //                                     volumealsa_theme_change, vol);
-
-    /* Deallocate all memory. */
-	dhcpcd_free(dhcp->con);
-   	g_free(dhcp);
-}
-
-static gboolean dhcpcdui_button_press_event(GtkWidget * widget, GdkEventButton * event, LXPanel * panel)
-{
-    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(widget);
-
-    /* Left-click.  Show or hide the popup window. */
+    /* Show or hide the popup menu on left-click */
     if (event->button == 1)
     {
     	menu_show (dhcp);
@@ -766,118 +701,118 @@ static gboolean dhcpcdui_button_press_event(GtkWidget * widget, GdkEventButton *
     else return FALSE;
 }
 
-/* Plugin constructor. */
-static GtkWidget *dhcpcdui_constructor(LXPanel *panel, config_setting_t *settings)
+static GtkWidget *dhcpcdui_configure (LXPanel *panel, GtkWidget *p)
 {
-    /* Allocate and initialize plugin context and set into Plugin private data pointer. */
-    DHCPCDUIPlugin * dhcp = g_new0(DHCPCDUIPlugin, 1);
-    GtkWidget *p;
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (p);
     
-    setlocale(LC_ALL, "");
-	bindtextdomain(PACKAGE, NULL);
-	bind_textdomain_codeset(PACKAGE, "UTF-8");
-	textdomain(PACKAGE);
-
-	gtk_icon_theme_append_search_path(gtk_icon_theme_get_default(),
-	    ICONDIR);
-	dhcp->tray_icon = gtk_image_new_from_icon_name("network-offline", panel_get_icon_size (panel) - ICON_BUTTON_TRIM);
-
-	gtk_widget_set_tooltip_text(dhcp->tray_icon, _("Connecting to dhcpcd ..."));
-	gtk_widget_set_visible(dhcp->tray_icon, true);
-	dhcp->online = false;
-
-	TAILQ_INIT(&dhcp->wi_scans);
-	g_message(_("Connecting ..."));
-	dhcp->con = dhcpcd_new();
-	if (dhcp->con ==  NULL) {
-		g_critical("libdhcpcd: %s", strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-	dhcpcd_set_progname(dhcp->con, "dhcpcd-gtk");    
-
-    /* Allocate top level widget and set into Plugin widget pointer. */
-    dhcp->panel = panel;
-    dhcp->plugin = p = gtk_button_new();
-    gtk_button_set_relief (GTK_BUTTON (dhcp->plugin), GTK_RELIEF_NONE);
-    g_signal_connect(dhcp->plugin, "button-press-event", G_CALLBACK(dhcpcdui_button_press_event), NULL);
-    dhcp->settings = settings;
-    lxpanel_plugin_set_data(p, dhcp, dhcpcdui_destructor);
-    gtk_widget_add_events(p, GDK_BUTTON_PRESS_MASK);
-
-    /* Allocate icon as a child of top level. */
-    dhcp->tray_icon = gtk_image_new();
-    gtk_container_add(GTK_CONTAINER(p), dhcp->tray_icon);
-    
-    
-    dhcpcd_set_status_callback(dhcp->con, dhcpcd_status_cb, dhcp);
-	dhcpcd_set_if_callback(dhcp->con, dhcpcd_if_cb, dhcp);
-	dhcpcd_wpa_set_scan_callback(dhcp->con, dhcpcd_wpa_scan_cb, dhcp);
-	dhcpcd_wpa_set_status_callback(dhcp->con, dhcpcd_wpa_status_cb, dhcp);
-	if (dhcpcd_try_open(dhcp))
-		dhcp->reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
-
-	//menu_init(p, dhcp->con);
-#ifdef BG_SCAN
-	dhcp->defscan_timer = g_timeout_add(DHCPCD_WPA_SCAN_LONG, bgscan, dhcp);
-#endif
-
-    /* Update the display, show the widget, and return. */
-    //volumealsa_update_display(vol);
-    gtk_widget_show_all(p);
-    return p;
-}
-#if 0
-
-int
-main(int argc, char *argv[])
-{
-	DHCPCD_CONNECTION *con;
-
-
-	gtk_icon_theme_append_search_path(gtk_icon_theme_get_default(),
-	    ICONDIR);
-	status_icon = gtk_status_icon_new_from_icon_name("network-offline");
-
-	gtk_status_icon_set_tooltip_text(status_icon,
-	    _("Connecting to dhcpcd ..."));
-	gtk_status_icon_set_visible(status_icon, true);
-
-
-	menu_init(status_icon, con);
-
-	return 0;
-}
-
-#endif
-
-static GtkWidget *dhcpcdui_configure(LXPanel *panel, GtkWidget *p)
-{
-    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
     prefs_show (dhcp);
 	return NULL;
 }
 
-static void dhcpcdui_configuration_changed(LXPanel *panel, GtkWidget *p)
+static void dhcpcdui_configuration_changed (LXPanel *panel, GtkWidget *p)
 {
-    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
-	const char *msg;
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (p);
+	const char *icon;
 	DHCPCD_WI_SCAN *s1;
 	
 	if (!dhcp->ani_timer) 
 	{
-		s1 = get_strongest_scan(p);
+		s1 = get_strongest_scan (p);
 		if (s1)
-			msg = get_strength_icon_name(s1->strength.value);
+			icon = get_strength_icon_name (s1->strength.value);
 		else if (dhcp->online)
-			msg = "network-transmit-receive";
+			icon = "network-transmit-receive";
 		else
-			msg = "network-offline";
-    	GdkPixbuf * pixbuf = gtk_icon_theme_load_icon(panel_get_icon_theme (dhcp->panel), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
-    	gtk_image_set_from_pixbuf(GTK_IMAGE(dhcp->tray_icon), pixbuf);
-		//gtk_image_set_from_icon_name(GTK_IMAGE(dhcp->tray_icon), msg, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM);
+			icon = "network-offline";
+    	GdkPixbuf *pixbuf = gtk_icon_theme_load_icon (panel_get_icon_theme (dhcp->panel), icon, panel_get_icon_size (dhcp->panel) - ICON_BUTTON_TRIM, 0, NULL);
+    	gtk_image_set_from_pixbuf (GTK_IMAGE(dhcp->tray_icon), pixbuf);
 	}
 }
 
+/* Plugin destructor. */
+static void dhcpcdui_destructor (gpointer user_data)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) user_data;
+
+	/* Close associated dialogs and menu */
+	wpa_abort (dhcp);
+	menu_abort (dhcp);
+	prefs_abort (dhcp);
+	
+	/* Close connection and kill timers which would reopen it */
+ 	dhcpcd_close(dhcp->con);
+    if (dhcp->reopen_timer != 0) g_source_remove (dhcp->reopen_timer);
+    if (dhcp->wpa_reopen_timer != 0) g_source_remove(dhcp->wpa_reopen_timer);
+    
+    /* Remove other timers */
+    if (dhcp->bgscan_timer != 0) g_source_remove (dhcp->bgscan_timer);
+    if (dhcp->defscan_timer != 0) g_source_remove (dhcp->defscan_timer);
+    if (dhcp->ani_timer != 0) g_source_remove (dhcp->ani_timer);
+        
+    /* Deallocate memory */
+	dhcpcd_free (dhcp->con);
+   	g_free (dhcp);
+}
+
+/* Plugin constructor. */
+static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settings)
+{
+    /* Allocate and initialize plugin context */
+    DHCPCDUIPlugin * dhcp = g_new0 (DHCPCDUIPlugin, 1);
+    GtkWidget *p;
+    
+    setlocale (LC_ALL, "");
+	bindtextdomain (PACKAGE, NULL);
+	bind_textdomain_codeset (PACKAGE, "UTF-8");
+	textdomain (PACKAGE);
+
+	gtk_icon_theme_append_search_path (gtk_icon_theme_get_default(), ICONDIR);
+	dhcp->tray_icon = gtk_image_new_from_icon_name ("network-offline", panel_get_icon_size (panel) - ICON_BUTTON_TRIM);
+	gtk_widget_set_tooltip_text (dhcp->tray_icon, _("Connecting to dhcpcd ..."));
+	gtk_widget_set_visible (dhcp->tray_icon, true);
+	
+	dhcp->online = false;
+
+	TAILQ_INIT(&dhcp->wi_scans);
+	g_message(_("Connecting ..."));
+	dhcp->con = dhcpcd_new ();
+	if (dhcp->con ==  NULL) 
+	{
+		g_critical ("libdhcpcd: %s", strerror(errno));
+		return NULL;
+	}
+	dhcpcd_set_progname (dhcp->con, "dhcpcd-gtk");    
+
+    /* Allocate top level widget and set into Plugin widget pointer. */
+    dhcp->panel = panel;
+    dhcp->plugin = p = gtk_button_new ();
+    gtk_button_set_relief (GTK_BUTTON (dhcp->plugin), GTK_RELIEF_NONE);
+    g_signal_connect (dhcp->plugin, "button-press-event", G_CALLBACK(dhcpcdui_button_press_event), NULL);
+    dhcp->settings = settings;
+    lxpanel_plugin_set_data (p, dhcp, dhcpcdui_destructor);
+    gtk_widget_add_events (p, GDK_BUTTON_PRESS_MASK);
+
+    /* Allocate icon as a child of top level */
+    dhcp->tray_icon = gtk_image_new();
+    gtk_container_add (GTK_CONTAINER(p), dhcp->tray_icon);
+    
+    /* Setup callbacks */
+    dhcpcd_set_status_callback (dhcp->con, dhcpcd_status_cb, dhcp);
+	dhcpcd_set_if_callback (dhcp->con, dhcpcd_if_cb, dhcp);
+	dhcpcd_wpa_set_scan_callback (dhcp->con, dhcpcd_wpa_scan_cb, dhcp);
+	dhcpcd_wpa_set_status_callback (dhcp->con, dhcpcd_wpa_status_cb, dhcp);
+	if (dhcpcd_try_open (dhcp))
+		dhcp->reopen_timer = g_timeout_add (DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
+
+#ifdef BG_SCAN
+	/* Start background scanning */
+	dhcp->defscan_timer = g_timeout_add (DHCPCD_WPA_SCAN_LONG, bgscan, dhcp);
+#endif
+
+    /* Show the widget, and return. */
+    gtk_widget_show_all (p);
+    return p;
+}
 
 FM_DEFINE_MODULE(lxpanel_gtk, dhcpcdui)
 
@@ -885,11 +820,8 @@ FM_DEFINE_MODULE(lxpanel_gtk, dhcpcdui)
 LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .name = N_("dhcpcdui"),
     .description = N_("Network interface for dhcpcd"),
-
     .new_instance = dhcpcdui_constructor,
     .config = dhcpcdui_configure,
     .reconfigure = dhcpcdui_configuration_changed,
     .button_press_event = dhcpcdui_button_press_event
 };
-
-
