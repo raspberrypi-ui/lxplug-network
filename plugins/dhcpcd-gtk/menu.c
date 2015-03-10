@@ -285,9 +285,21 @@ menu_remove_if(WI_SCAN *wi, DHCPCDUIPlugin * dhcp)
 		return;
 
 	if (wi->ifmenu == dhcp->menu)
+	{
 		dhcp->menu = NULL;
-
-	gtk_widget_destroy(wi->ifmenu);
+		gtk_widget_destroy(wi->ifmenu);
+	}
+	else
+	{
+		/* if there are multiple interfaces and hence a top-level menu, remove the entry for the removed interface */
+		GList *children = gtk_container_get_children (GTK_CONTAINER(dhcp->menu));
+        while ((children = g_list_next(children)) != NULL) 
+        {
+        	GtkWidget *item = children->data;
+        	if (!strcmp (gtk_menu_item_get_label (GTK_MENU_ITEM(item)), wi->interface->ifname))
+        		gtk_widget_destroy (GTK_WIDGET(item));
+        }		
+	}
 	wi->ifmenu = NULL;
 	while ((wim = TAILQ_FIRST(&wi->menus))) {
 		TAILQ_REMOVE(&wi->menus, wim, next);
