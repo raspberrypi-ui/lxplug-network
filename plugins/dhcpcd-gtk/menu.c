@@ -120,36 +120,27 @@ is_associated(WI_SCAN *wi, DHCPCD_WI_SCAN *scan)
 }
 
 static void
-update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan)
+update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
 {
 	const char *icon;
-	GtkWidget *sel;
+	GtkWidget *sel = gtk_image_new ();
 
 	m->scan = scan;
 
 	g_object_set_data(G_OBJECT(m->menu), "dhcpcd_wi_scan", scan);
 
 	m->associated = is_associated(wi, scan);
-	if (m->associated)
-		sel = gtk_image_new_from_icon_name("dialog-ok-apply",
-		    GTK_ICON_SIZE_MENU);
-	else
-		sel = NULL;
-	gtk_image_menu_item_set_image(
-	    GTK_IMAGE_MENU_ITEM(m->menu), sel);
+	if (m->associated) set_icon (dhcp->panel, sel, "dialog-ok-apply", 16);
+	gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
+	
+	gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
 
-	gtk_label_set_text(GTK_LABEL(m->ssid), scan->ssid);
-	if (scan->flags & WSF_SECURE)
-		icon = "network-wireless-encrypted";
-	else
-		icon = NULL;
-	m->icon = gtk_image_new_from_icon_name(icon,
-	    GTK_ICON_SIZE_MENU);
+	m->icon = gtk_image_new ();
+	if (scan->flags & WSF_SECURE) set_icon (dhcp->panel, m->icon, "network-wireless-encrypted", 16);
 
-	icon = get_strength_icon_name(scan->strength.value);
-	m->strength = gtk_image_new_from_icon_name(icon,
-		GTK_ICON_SIZE_MENU);
-
+	m->strength = gtk_image_new ();
+	set_icon (dhcp->panel, m->strength, get_strength_icon_name (scan->strength.value), 16);
+	
 #if 0
 	if (scan->wpa_flags[0] == '\0')
 		gtk_widget_set_tooltip_text(m->menu, scan->bssid);
@@ -167,6 +158,7 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan)
 static WI_MENU *
 create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
 {
+    DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data(p);
 	WI_MENU *wim;
 	GtkWidget *box;
 	const char *icon;
@@ -181,17 +173,12 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
 	gtk_misc_set_alignment(GTK_MISC(wim->ssid), 0.0, 0.5);
 	gtk_box_pack_start(GTK_BOX(box), wim->ssid, TRUE, TRUE, 0);
 
-	if (scan->flags & WSF_SECURE)
-		icon = "network-wireless-encrypted";
-	else
-		icon = NULL;
-	wim->icon = gtk_image_new_from_icon_name(icon,
-	    GTK_ICON_SIZE_MENU);
+	wim->icon = gtk_image_new ();
+	if (scan->flags & WSF_SECURE) set_icon (dhcp->panel, wim->icon, "network-wireless-encrypted", 16);
 	gtk_box_pack_start(GTK_BOX(box), wim->icon, FALSE, FALSE, 0);
 
-	icon = get_strength_icon_name(scan->strength.value);
-	wim->strength = gtk_image_new_from_icon_name(icon,
-		GTK_ICON_SIZE_MENU);
+	wim->strength = gtk_image_new ();
+	set_icon (dhcp->panel, wim->strength, get_strength_icon_name (scan->strength.value), 16);
 	gtk_box_pack_start(GTK_BOX(box), wim->strength, FALSE, FALSE, 0);
 
 #if 0
@@ -203,7 +190,7 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
 		g_free(tip);
 	}
 #endif
-	update_item(wis, wim, scan);
+	update_item(wis, wim, scan, dhcp);
 
 	g_signal_connect(G_OBJECT(wim->menu), "activate",
 	    G_CALLBACK(ssid_hook), p);
@@ -419,7 +406,7 @@ menu_bgscan(gpointer data)
 
 static void dhcpcdui_popup_set_position(GtkMenu * menu, gint * px, gint * py, gboolean * push_in, gpointer data)
 {
-    DHCPCDUIPlugin * dhcp= (DHCPCDUIPlugin *) data;
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) data;
 
     /* Determine the coordinates. */
     lxpanel_plugin_popup_set_position_helper(dhcp->panel, dhcp->plugin, GTK_WIDGET(menu), px, py);
@@ -433,7 +420,7 @@ menu_show (DHCPCDUIPlugin *data)
 {
 	WI_SCAN *w, *l;
 	GtkWidget *item, *image;
-
+	
 	//sicon = icon;
 	notify_close();
 	prefs_abort(data);
@@ -447,8 +434,8 @@ menu_show (DHCPCDUIPlugin *data)
 		TAILQ_FOREACH(w, &data->wi_scans, next) {
 			item = gtk_image_menu_item_new_with_label(
 				w->interface->ifname);
-			image = gtk_image_new_from_icon_name(
-				"network-wireless", GTK_ICON_SIZE_MENU);
+			image = gtk_image_new ();
+			set_icon (data->panel, image, "network-wireless", 16);
 			gtk_image_menu_item_set_image(
 				GTK_IMAGE_MENU_ITEM(item), image);
 			gtk_menu_shell_append(GTK_MENU_SHELL(data->menu), item);

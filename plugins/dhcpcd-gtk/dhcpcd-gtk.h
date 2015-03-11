@@ -120,6 +120,7 @@ typedef struct {
 } DHCPCDUIPlugin;
 
 const char *get_strength_icon_name(int strength);
+void set_icon (LXPanel *p, GtkWidget *image, const char *icon, int size);
 
 void menu_init(GtkButton *, DHCPCD_CONNECTION *);
 void menu_update_scans(WI_SCAN *, DHCPCD_WI_SCAN *, GtkWidget *);
