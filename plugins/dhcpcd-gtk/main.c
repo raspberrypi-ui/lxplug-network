@@ -727,8 +727,7 @@ static GtkWidget *dhcpcdui_configure (LXPanel *panel, GtkWidget *p)
 {
     DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (p);
     
-    prefs_show (dhcp);
-	return NULL;
+    return prefs_show (dhcp);
 }
 
 static void dhcpcdui_configuration_changed (LXPanel *panel, GtkWidget *p)

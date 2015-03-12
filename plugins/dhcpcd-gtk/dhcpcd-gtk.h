@@ -129,7 +129,7 @@ void menu_show (DHCPCDUIPlugin *);
 
 void notify_close(void);
 
-void prefs_show(DHCPCDUIPlugin *);
+GtkWidget *prefs_show(DHCPCDUIPlugin *);
 void prefs_abort(DHCPCDUIPlugin *);
 void menu_abort(DHCPCDUIPlugin *);
 void wpa_abort(DHCPCDUIPlugin *);

@@ -484,11 +484,8 @@ static void
 prefs_close(_unused GObject *widget, gpointer data)
 {
 	DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) data;
-	
-	if (dhcp->dialog != NULL) {
-		gtk_widget_destroy(dhcp->dialog);
-		dhcp->dialog = NULL;
-	}
+    gtk_dialog_response (GTK_DIALOG(dhcp->dialog), GTK_RESPONSE_CLOSE);
+	dhcp->dialog = NULL;
 }
 
 void
@@ -511,7 +508,7 @@ gtk_separator_new(GtkOrientation o)
 }
 #endif
 
-void
+GtkWidget *
 prefs_show(DHCPCDUIPlugin *dhcp)
 {
 	GtkWidget *dialog_vbox, *hbox, *vbox, *table, *w;
@@ -520,15 +517,15 @@ prefs_show(DHCPCDUIPlugin *dhcp)
 	GtkCellRenderer *rend;
 	GdkPixbuf *pb;
 
-	if (dhcp->dialog) {
-		gtk_window_present(GTK_WINDOW(dhcp->dialog));
-		return;
-	}
+	//if (dhcp->dialog) {
+	//	gtk_window_present(GTK_WINDOW(dhcp->dialog));
+	//	return;
+	//}
 
 	if (g_strcmp0(dhcpcd_status(dhcp->con), "down") == 0)
-		return;
+		return NULL;
 
-	dhcp->dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	dhcp->dialog = gtk_dialog_new();
 	g_signal_connect(G_OBJECT(dhcp->dialog), "destroy",
 	    G_CALLBACK(on_destroy), dhcp);
 
@@ -536,13 +533,11 @@ prefs_show(DHCPCDUIPlugin *dhcp)
 	gtk_window_set_resizable(GTK_WINDOW(dhcp->dialog), false);
 	gtk_window_set_icon_name(GTK_WINDOW(dhcp->dialog),
 	    "preferences-system-network");
-	gtk_window_set_position(GTK_WINDOW(dhcp->dialog), GTK_WIN_POS_MOUSE);
 	gtk_window_set_type_hint(GTK_WINDOW(dhcp->dialog),
 	    GDK_WINDOW_TYPE_HINT_DIALOG);
 
-	dialog_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
 	gtk_container_set_border_width(GTK_CONTAINER(dhcp->dialog), 10);
-	gtk_container_add(GTK_CONTAINER(dhcp->dialog), dialog_vbox);
+	dialog_vbox = gtk_dialog_get_content_area (GTK_DIALOG(dhcp->dialog));
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_box_pack_start(GTK_BOX(dialog_vbox), hbox, false, false, 3);
@@ -635,31 +630,26 @@ prefs_show(DHCPCDUIPlugin *dhcp)
 	attach_label(w, 0, 1, 4, 5);
 	attach_entry(dhcp->dns_search, 1, 2, 4, 5);
 
-	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-	gtk_box_pack_start(GTK_BOX(dialog_vbox), hbox, true, true, 3);
-	dhcp->clear = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
+	dhcp->clear = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_CLEAR, 1);
 	gtk_widget_set_sensitive(dhcp->clear, false);
-	gtk_box_pack_start(GTK_BOX(hbox), dhcp->clear, true, true, 0);
 	g_signal_connect(G_OBJECT(dhcp->clear), "clicked",
 	    G_CALLBACK(on_clear), dhcp);
-	dhcp->rebind = gtk_button_new_with_mnemonic(_("_Rebind"));
+	dhcp->rebind = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), _("_Rebind"), 1);
 	gtk_widget_set_sensitive(dhcp->rebind, false);
 	w = gtk_image_new_from_icon_name("application-x-executable",
 	    GTK_ICON_SIZE_BUTTON);
 	gtk_button_set_image(GTK_BUTTON(dhcp->rebind), w);
-	gtk_box_pack_start(GTK_BOX(hbox), dhcp->rebind, true, true, 0);
 	g_signal_connect(G_OBJECT(dhcp->rebind), "clicked",
 	    G_CALLBACK(on_rebind), dhcp);
-	w = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-	gtk_box_pack_end(GTK_BOX(hbox), w, true, true, 0);
-	g_signal_connect(G_OBJECT(w), "clicked",
-	    G_CALLBACK(prefs_close), dhcp);
+	gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
 
 	blocks_on_change(dhcp->blocks, dhcp);
 	show_config(NULL, dhcp);
-	gtk_widget_show_all(dhcp->dialog);
+	gtk_widget_show_all(gtk_dialog_get_content_area (GTK_DIALOG(dhcp->dialog)));
 
 	if (!dhcpcd_config_writeable(dhcp->con))
 		config_err_dialog(dhcp->con, true,
 		    _("The dhcpcd configuration file is not writeable"));
+
+	return dhcp->dialog;
 }
