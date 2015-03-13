@@ -135,11 +135,11 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
 	
 	gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
 
-	m->icon = gtk_image_new ();
-	if (scan->flags & WSF_SECURE) set_icon (dhcp->panel, m->icon, "network-wireless-encrypted", 16);
+	//m->icon = gtk_image_new ();
+	//if (scan->flags & WSF_SECURE) set_icon (dhcp->panel, m->icon, "network-wireless-encrypted", 16);
 
-	m->strength = gtk_image_new ();
-	set_icon (dhcp->panel, m->strength, get_strength_icon_name (scan->strength.value), 16);
+	//m->strength = gtk_image_new ();
+	//set_icon (dhcp->panel, m->strength, get_strength_icon_name (scan->strength.value), 16);
 	
 #if 0
 	if (scan->wpa_flags[0] == '\0')
