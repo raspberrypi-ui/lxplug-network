@@ -631,16 +631,13 @@ prefs_show(DHCPCDUIPlugin *dhcp)
 	attach_entry(dhcp->dns_search, 1, 2, 4, 5);
 
 	dhcp->clear = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_CLEAR, 1);
+	gtk_button_set_label (GTK_BUTTON(dhcp->clear), _("C_lear"));
+	gtk_button_set_image (GTK_BUTTON(dhcp->clear), gtk_image_new_from_stock (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON));
 	gtk_widget_set_sensitive(dhcp->clear, false);
-	g_signal_connect(G_OBJECT(dhcp->clear), "clicked",
-	    G_CALLBACK(on_clear), dhcp);
-	dhcp->rebind = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), _("_Rebind"), 1);
+	g_signal_connect(G_OBJECT(dhcp->clear), "clicked", G_CALLBACK (on_clear), dhcp);
+	dhcp->rebind = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_APPLY, 1);
 	gtk_widget_set_sensitive(dhcp->rebind, false);
-	w = gtk_image_new_from_icon_name("application-x-executable",
-	    GTK_ICON_SIZE_BUTTON);
-	gtk_button_set_image(GTK_BUTTON(dhcp->rebind), w);
-	g_signal_connect(G_OBJECT(dhcp->rebind), "clicked",
-	    G_CALLBACK(on_rebind), dhcp);
+	g_signal_connect(G_OBJECT(dhcp->rebind), "clicked", G_CALLBACK (on_rebind), dhcp);
 	gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
 
 	blocks_on_change(dhcp->blocks, dhcp);
