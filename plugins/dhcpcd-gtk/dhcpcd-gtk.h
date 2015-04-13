@@ -49,74 +49,74 @@
 #endif
 
 typedef struct wi_menu {
-	TAILQ_ENTRY(wi_menu) next;
-	DHCPCD_WI_SCAN *scan;
-	bool associated;
-	GtkWidget *menu;
-	GtkWidget *ssid;
-	GtkWidget *icon;
-	GtkWidget *strength;
+    TAILQ_ENTRY(wi_menu) next;
+    DHCPCD_WI_SCAN *scan;
+    bool associated;
+    GtkWidget *menu;
+    GtkWidget *ssid;
+    GtkWidget *icon;
+    GtkWidget *strength;
 } WI_MENU;
 typedef TAILQ_HEAD(wi_menu_head, wi_menu) WI_MENUS;
 
 typedef struct wi_scan {
-	TAILQ_ENTRY(wi_scan) next;
-	DHCPCD_IF *interface;
-	DHCPCD_WI_SCAN *scans;
+    TAILQ_ENTRY(wi_scan) next;
+    DHCPCD_IF *interface;
+    DHCPCD_WI_SCAN *scans;
 
-	GtkWidget *ifmenu;
-	GtkWidget *sep;
-	GtkWidget *noap;
-	WI_MENUS menus;
+    GtkWidget *ifmenu;
+    GtkWidget *sep;
+    GtkWidget *noap;
+    WI_MENUS menus;
 } WI_SCAN;
 
 typedef TAILQ_HEAD(wi_scan_head, wi_scan) WI_SCANS;
 
 typedef struct watch {
-	gpointer ref;
-	int fd;
-	guint eventid;
-	GIOChannel *gio;
-	struct watch *next;
+    gpointer ref;
+    int fd;
+    guint eventid;
+    GIOChannel *gio;
+    struct watch *next;
 } watch;
 
 typedef struct {
 
-    GtkWidget *plugin;				/* Back pointer to the widget */
-    LXPanel *panel;					/* Back pointer to panel */
-    GtkWidget *tray_icon;			/* Displayed image */
-    config_setting_t *settings;		/* Plugin settings */
+    GtkWidget *plugin;              /* Back pointer to the widget */
+    LXPanel *panel;                 /* Back pointer to panel */
+    GtkWidget *tray_icon;           /* Displayed image */
+    config_setting_t *settings;     /* Plugin settings */
 
-    DHCPCD_CONNECTION *con;			/* Global connection data */
-    
-	/* Main globals */
-	guint ani_timer;
-	int ani_counter;
-	bool online;
-	bool carrier;
-	struct watch *watches;
-	WI_SCANS wi_scans;
-	
-	/* Timer handles */
-	guint bgscan_timer;
-	guint defscan_timer;
-	guint reopen_timer;
-	guint wpa_reopen_timer;
-	
-	/* Menu */
-	GtkWidget *menu;
-	
-	/* Preference dialog */
-	GtkWidget *dialog, *blocks, *names, *controls, *clear, *rebind;
-	GtkWidget *autoconf, *address, *router, *dns_servers, *dns_search;
-	DHCPCD_OPTION *config;
-	char *block, *name;
-	DHCPCD_IF *iface;
-	char **ifaces;
-	
-	/* WPA dialog */
-	GtkWidget *wpa_dialog, *wpa_err;
-	
+    DHCPCD_CONNECTION *con;         /* Global connection data */
+
+    /* Main globals */
+    guint ani_timer;
+    int ani_counter;
+    bool online;
+    bool carrier;
+    struct watch *watches;
+    WI_SCANS wi_scans;
+
+    /* Timer handles */
+    guint bgscan_timer;
+    guint defscan_timer;
+    guint reopen_timer;
+    guint wpa_reopen_timer;
+
+    /* Menu */
+    GtkWidget *menu;
+
+    /* Preference dialog */
+    GtkWidget *dialog, *blocks, *names, *controls, *clear, *rebind;
+    GtkWidget *autoconf, *address, *router, *dns_servers, *dns_search;
+    DHCPCD_OPTION *config;
+    char *block, *name;
+    DHCPCD_IF *iface;
+    char **ifaces;
+
+    /* WPA dialog */
+    GtkWidget *wpa_dialog, *wpa_err;
+
 } DHCPCDUIPlugin;
 
 const char *get_strength_icon_name(int strength);

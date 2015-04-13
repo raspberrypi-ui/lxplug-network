@@ -37,147 +37,147 @@ extern "C" {
 #endif
 
 #ifndef DHCPCD_SOCKET
-#define DHCPCD_SOCKET		"/var/run/dhcpcd.sock"
+#define DHCPCD_SOCKET       "/var/run/dhcpcd.sock"
 #endif
 #ifndef DHCPCD_UNPRIV_SOCKET
-#define DHCPCD_UNPRIV_SOCKET	"/var/run/dhcpcd.unpriv.sock"
+#define DHCPCD_UNPRIV_SOCKET    "/var/run/dhcpcd.unpriv.sock"
 #endif
 
 #ifndef WPA_CTRL_DIR
-#define WPA_CTRL_DIR		"/var/run/wpa_supplicant"
+#define WPA_CTRL_DIR        "/var/run/wpa_supplicant"
 #endif
 
-#define DHCPCD_RETRYOPEN	100	/* milliseconds */
-#define DHCPCD_WPA_PING		500	/* milliseconds */
-#define DHCPCD_WPA_SCAN_LONG	60000	/* milliseconds */
-#define DHCPCD_WPA_SCAN_SHORT	5000	/* milliseconds */
-#define DHCPCD_WI_HIST_MAX	10	/* Recall 10 scans for averages */
+#define DHCPCD_RETRYOPEN    100 /* milliseconds */
+#define DHCPCD_WPA_PING     500 /* milliseconds */
+#define DHCPCD_WPA_SCAN_LONG    60000   /* milliseconds */
+#define DHCPCD_WPA_SCAN_SHORT   5000    /* milliseconds */
+#define DHCPCD_WI_HIST_MAX  10  /* Recall 10 scans for averages */
 
 /* Each non printable byte of the SSID is represented as \000 */
-#define IF_SSIDSIZE		((32 * 4) + 1)
-#define IF_BSSIDSIZE		64
-#define FLAGSIZE		64
-#define TYPESIZE		8
-#define REASONSIZE		16
+#define IF_SSIDSIZE     ((32 * 4) + 1)
+#define IF_BSSIDSIZE        64
+#define FLAGSIZE        64
+#define TYPESIZE        8
+#define REASONSIZE      16
 
 typedef struct dhcpcd_wi_avs {
-	int value;
-	int average;
+    int value;
+    int average;
 } DHCPCD_WI_AV;
 
 typedef struct dhcpcd_wi_scan {
-	struct dhcpcd_wi_scan *next;
-	char bssid[IF_BSSIDSIZE];
-	int flags;
-#define WSF_SECURE		0x01
-#define WSF_PSK			0x02
-#define WSF_WEP			0x10
-#define WSF_WPA			0x20
-	int frequency;
-	DHCPCD_WI_AV quality;
-	DHCPCD_WI_AV noise;
-	DHCPCD_WI_AV level;
-	DHCPCD_WI_AV strength;
-	char ssid[IF_SSIDSIZE];
-	char wpa_flags[FLAGSIZE];
+    struct dhcpcd_wi_scan *next;
+    char bssid[IF_BSSIDSIZE];
+    int flags;
+#define WSF_SECURE      0x01
+#define WSF_PSK         0x02
+#define WSF_WEP         0x10
+#define WSF_WPA         0x20
+    int frequency;
+    DHCPCD_WI_AV quality;
+    DHCPCD_WI_AV noise;
+    DHCPCD_WI_AV level;
+    DHCPCD_WI_AV strength;
+    char ssid[IF_SSIDSIZE];
+    char wpa_flags[FLAGSIZE];
 } DHCPCD_WI_SCAN;
 
 #ifdef IN_LIBDHCPCD
 typedef struct dhcpcd_if {
-	struct dhcpcd_if *next;
-	const char *ifname;
-	const char *type;
-	const char *reason;
+    struct dhcpcd_if *next;
+    const char *ifname;
+    const char *type;
+    const char *reason;
 
-	unsigned int flags;
-	bool up;
-	bool wireless;
-	const char *ssid;
+    unsigned int flags;
+    bool up;
+    bool wireless;
+    const char *ssid;
 
-	char *data;
-	size_t data_len;
+    char *data;
+    size_t data_len;
 
-	char *last_message;
+    char *last_message;
 
-	struct dhcpcd_connection *con;
+    struct dhcpcd_connection *con;
 } DHCPCD_IF;
 #else
 typedef struct dhcpcd_if {
-	struct dhcpcd_if *next;
-	const char *ifname;
-	const char *type;
-	const char *reason;
+    struct dhcpcd_if *next;
+    const char *ifname;
+    const char *type;
+    const char *reason;
 
-	int flags;
-	bool up;
-	bool wireless;
-	const char *ssid;
+    int flags;
+    bool up;
+    bool wireless;
+    const char *ssid;
 } DHCPCD_IF;
 #endif
 
 typedef struct dhcpcd_config {
-	struct dhcpcd_config *next;
-	char *option;
-	char *value;
+    struct dhcpcd_config *next;
+    char *option;
+    char *value;
 } DHCPCD_OPTION;
 
 #ifdef IN_LIBDHCPCD
 typedef struct dhcpcd_wi_hist {
-	struct dhcpcd_wi_hist *next;
-	char ifname[IF_NAMESIZE];
-	char bssid[IF_BSSIDSIZE];
-	int quality;
-	int noise;
-	int level;
-	int strength;
+    struct dhcpcd_wi_hist *next;
+    char ifname[IF_NAMESIZE];
+    char bssid[IF_BSSIDSIZE];
+    int quality;
+    int noise;
+    int level;
+    int strength;
 } DHCPCD_WI_HIST;
 
 typedef struct dhcpcd_wpa {
-	struct dhcpcd_wpa *next;
-	char ifname[IF_NAMESIZE];
-	bool open;
-	int command_fd;
-	char *command_path;
-	int listen_fd;
-	char *listen_path;
-	bool attached;
-	struct dhcpcd_connection *con;
-	void *context;
+    struct dhcpcd_wpa *next;
+    char ifname[IF_NAMESIZE];
+    bool open;
+    int command_fd;
+    char *command_path;
+    int listen_fd;
+    char *listen_path;
+    bool attached;
+    struct dhcpcd_connection *con;
+    void *context;
 } DHCPCD_WPA;
 
 typedef struct dhcpcd_connection {
-	struct dhcpcd_connection *next;
-	bool open;
-	bool privileged;
-	int command_fd;
-	int listen_fd;
-	const char *progname;
+    struct dhcpcd_connection *next;
+    bool open;
+    bool privileged;
+    int command_fd;
+    int listen_fd;
+    const char *progname;
 
-	DHCPCD_IF *interfaces;
-	DHCPCD_WPA *wpa;
-	DHCPCD_WI_HIST *wi_history;
+    DHCPCD_IF *interfaces;
+    DHCPCD_WPA *wpa;
+    DHCPCD_WI_HIST *wi_history;
 
-	void (*if_cb)(DHCPCD_IF *, void *);
-	void *if_context;
-	void (*status_cb)(struct dhcpcd_connection *, const char *, void *);
-	void *status_context;
-	bool wpa_started;
-	void (*wi_scanresults_cb)(DHCPCD_WPA *, void *);
-	void *wi_scanresults_context;
-	void (*wpa_status_cb)(DHCPCD_WPA *, const char *, void *);
-	void *wpa_status_context;
+    void (*if_cb)(DHCPCD_IF *, void *);
+    void *if_context;
+    void (*status_cb)(struct dhcpcd_connection *, const char *, void *);
+    void *status_context;
+    bool wpa_started;
+    void (*wi_scanresults_cb)(DHCPCD_WPA *, void *);
+    void *wi_scanresults_context;
+    void (*wpa_status_cb)(DHCPCD_WPA *, const char *, void *);
+    void *wpa_status_context;
 
-	char *buf;
-	size_t buflen;
+    char *buf;
+    size_t buflen;
 
-	char *version;
-	bool terminate_commands;
-	char *error;
-	int err;
-	int errors;
-	const char *status;
+    char *version;
+    bool terminate_commands;
+    char *error;
+    int err;
+    int errors;
+    const char *status;
 
-	char *cffile;
+    char *cffile;
 } DHCPCD_CONNECTION;
 
 #else
@@ -220,8 +220,8 @@ char * dhcpcd_if_message(DHCPCD_IF *, bool *);
 ssize_t dhcpcd_command(DHCPCD_CONNECTION *, const char *, char **);
 ssize_t dhcpcd_command_arg(DHCPCD_CONNECTION *, const char *, const char *,
     char **);
-#define dhcpcd_rebind(c, i)	dhcpcd_command_arg((c), "-n", (i), NULL)
-#define dhcpcd_release(c, i)	dhcpcd_command_arg((c), "-k", (i), NULL)
+#define dhcpcd_rebind(c, i) dhcpcd_command_arg((c), "-n", (i), NULL)
+#define dhcpcd_release(c, i)    dhcpcd_command_arg((c), "-k", (i), NULL)
 
 void dhcpcd_wpa_start(DHCPCD_CONNECTION *);
 DHCPCD_WPA *dhcpcd_wpa_find(DHCPCD_CONNECTION *, const char *);
@@ -261,16 +261,16 @@ bool dhcpcd_wpa_network_remove(DHCPCD_WPA *, int);
 char * dhcpcd_wpa_network_get(DHCPCD_WPA *, int, const char *);
 bool dhcpcd_wpa_network_set(DHCPCD_WPA *, int, const char *, const char *);
 
-#define DHCPCD_WPA_SUCCESS	 0
-#define DHCPCD_WPA_ERR		-1
-#define DHCPCD_WPA_ERR_SET	-2
-#define DHCPCD_WPA_ERR_SET_PSK	-3
-#define DHCPCD_WPA_ERR_ENABLE	-4
-#define DHCPCD_WPA_ERR_WRITE	-5
-#define DHCPCD_WPA_ERR_SELECT	-6
-#define DHCPCD_WPA_ERR_ASSOC	-7
-#define DHCPCD_WPA_ERR_DISCONN	-8
-#define DHCPCD_WPA_ERR_RECONF	-9
+#define DHCPCD_WPA_SUCCESS   0
+#define DHCPCD_WPA_ERR      -1
+#define DHCPCD_WPA_ERR_SET  -2
+#define DHCPCD_WPA_ERR_SET_PSK  -3
+#define DHCPCD_WPA_ERR_ENABLE   -4
+#define DHCPCD_WPA_ERR_WRITE    -5
+#define DHCPCD_WPA_ERR_SELECT   -6
+#define DHCPCD_WPA_ERR_ASSOC    -7
+#define DHCPCD_WPA_ERR_DISCONN  -8
+#define DHCPCD_WPA_ERR_RECONF   -9
 int dhcpcd_wpa_configure(DHCPCD_WPA *w, DHCPCD_WI_SCAN *s, const char *p);
 int dhcpcd_wpa_select(DHCPCD_WPA *w, DHCPCD_WI_SCAN *s);
 
