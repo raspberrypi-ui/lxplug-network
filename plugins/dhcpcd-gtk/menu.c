@@ -393,7 +393,7 @@ menu_bgscan(gpointer data)
     }
 
     TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
-        if (w->interface->wireless) {
+        if (dhcpcd_is_wireless(w->interface)) {
             wpa = dhcpcd_wpa_find(dhcpcd_if_connection (w->interface), w->interface->ifname);
             if (wpa)
                 dhcpcd_wpa_scan(wpa);

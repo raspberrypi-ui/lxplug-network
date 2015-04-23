@@ -290,6 +290,8 @@ bool dhcpcd_config_writeable(DHCPCD_CONNECTION *con);
 bool dhcpcd_config_write(DHCPCD_CONNECTION *,
     const char *, const char *, const DHCPCD_OPTION *);
 
+bool dhcpcd_is_wireless (DHCPCD_IF *i);
+
 #ifdef __cplusplus
 }
 #endif

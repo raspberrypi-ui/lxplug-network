@@ -1028,7 +1028,7 @@ dhcpcd_wpa_if_event(DHCPCD_IF *i)
             wpa = dhcpcd_wpa_find(i->con, i->ifname);
             if (wpa)
                 dhcpcd_wpa_close(wpa);
-        } else if (i->wireless && i->con->wpa_started) {
+        } else if (dhcpcd_is_wireless(i) && i->con->wpa_started) {
             wpa = dhcpcd_wpa_new(i->con, i->ifname);
             if (wpa && wpa->listen_fd == -1)
                 dhcpcd_wpa_open(wpa);

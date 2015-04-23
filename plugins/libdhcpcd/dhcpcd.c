@@ -740,7 +740,7 @@ dhcpcd_new_if(DHCPCD_CONNECTION *con, char *data, size_t len)
         i->up = strtobool(dhcpcd_get_value(i, "if_up"));
     i->wireless = strtobool(dhcpcd_get_value(i, "ifwireless"));
     i->ssid = dhcpcd_get_value(i, "ifssid");
-    if (i->ssid == NULL && i->wireless)
+    if (i->ssid == NULL && dhcpcd_is_wireless(i))
         i->ssid = dhcpcd_get_value(i, i->up ? "new_ssid" : "old_ssid");
 
        /* Sort! */
@@ -1116,7 +1116,7 @@ dhcpcd_if_message(DHCPCD_IF *i, bool *new_msg)
     if (strcmp(i->reason, "EXPIRE") == 0)
         reason = _("Expired");
     else if (strcmp(i->reason, "CARRIER") == 0) {
-        if (i->wireless) {
+        if (dhcpcd_is_wireless(i)) {
             showssid = true;
             reason = _("Associated with");
         } else {
@@ -1134,7 +1134,7 @@ dhcpcd_if_message(DHCPCD_IF *i, bool *new_msg)
             reason = _("Link is up, configuring");
         }
     } else if (strcmp(i->reason, "NOCARRIER") == 0) {
-        if (i->wireless) {
+        if (dhcpcd_is_wireless(i)) {
             if (i->ssid) {
                 reason = _("Disassociated from");
                 showssid = true;
@@ -1209,4 +1209,12 @@ dhcpcd_if_message(DHCPCD_IF *i, bool *new_msg)
     i->last_message = strdup(msg);
 
     return msg;
+}
+
+bool dhcpcd_is_wireless (DHCPCD_IF *i)
+{
+    // this really shouldn't be needed, but the Edimax dongle's driver fails to set the wireless flag...
+    if (i->wireless) return 1;
+    if (*(i->ifname) == 'w') return 1;
+    return 0;
 }

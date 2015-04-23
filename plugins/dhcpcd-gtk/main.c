@@ -516,7 +516,7 @@ dhcpcd_if_cb(DHCPCD_IF *i, gpointer p)
     con = dhcpcd_if_connection(i);
     update_online(con, false, dhcp->plugin);
 
-    if (i->wireless) {
+    if (dhcpcd_is_wireless (i)) {
         DHCPCD_WI_SCAN *scans;
         WI_SCAN *w;
 
@@ -699,7 +699,7 @@ bgscan(gpointer data)
     DHCPCD_WPA *wpa;
 
     TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
-        if (w->interface->wireless) {
+        if (dhcpcd_is_wireless(w->interface)) {
             wpa = dhcpcd_wpa_find(dhcp->con, w->interface->ifname);
             if (wpa)
                 dhcpcd_wpa_scan(wpa);
