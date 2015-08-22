@@ -311,6 +311,7 @@ add_scans(WI_SCAN *wi, GtkWidget *p)
     {
         m = gtk_menu_new ();
         wi->noap = gtk_menu_item_new_with_label (_("No APs found - scanning..."));
+	gtk_widget_set_sensitive (wi->noap, FALSE);
         gtk_menu_shell_append(GTK_MENU_SHELL(m), wi->noap);
         return m;
     }
@@ -427,9 +428,14 @@ menu_show (DHCPCDUIPlugin *data)
     menu_abort(data);
 
     if ((w = TAILQ_FIRST(&data->wi_scans)) == NULL)
-        return;
+    {
+        data->menu = gtk_menu_new ();
+        item = gtk_menu_item_new_with_label (_("No wireless interfaces found"));
+        gtk_widget_set_sensitive (item, FALSE);
+        gtk_menu_shell_append (GTK_MENU_SHELL(data->menu), item);
+    }
 
-    if ((l = TAILQ_LAST(&data->wi_scans, wi_scan_head)) && l != w) {
+    else if ((l = TAILQ_LAST(&data->wi_scans, wi_scan_head)) && l != w) {
         data->menu = gtk_menu_new();
         TAILQ_FOREACH(w, &data->wi_scans, next) {
             item = gtk_image_menu_item_new_with_label(
