@@ -492,7 +492,8 @@ dhcpcd_if_cb(DHCPCD_IF *i, gpointer p)
     /* We should ignore renew and stop so we don't annoy the user */
     if (g_strcmp0(i->reason, "RENEW") &&
         g_strcmp0(i->reason, "STOP") &&
-        g_strcmp0(i->reason, "STOPPED"))
+        g_strcmp0(i->reason, "STOPPED") &&
+        g_strcmp0(i->reason, "ROUTERADVERT"))
     {
         msg = dhcpcd_if_message(i, &new_msg);
         if (msg) {
@@ -514,7 +515,7 @@ dhcpcd_if_cb(DHCPCD_IF *i, gpointer p)
 
     /* Update the tooltip with connection information */
     con = dhcpcd_if_connection(i);
-    update_online(con, false, dhcp->plugin);
+    if (g_strcmp0(i->reason, "ROUTERADVERT")) update_online(con, false, dhcp->plugin);
 
     if (dhcpcd_is_wireless (i)) {
         DHCPCD_WI_SCAN *scans;
