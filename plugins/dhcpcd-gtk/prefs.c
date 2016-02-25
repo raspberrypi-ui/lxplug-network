@@ -484,7 +484,7 @@ static void
 prefs_close(_unused GObject *widget, gpointer data)
 {
     DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) data;
-    gtk_dialog_response (GTK_DIALOG(dhcp->dialog), GTK_RESPONSE_CLOSE);
+    if (dhcp->dialog) gtk_dialog_response (GTK_DIALOG(dhcp->dialog), GTK_RESPONSE_CLOSE);
     dhcp->dialog = NULL;
 }
 
