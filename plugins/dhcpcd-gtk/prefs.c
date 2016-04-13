@@ -45,7 +45,7 @@ config_err_dialog(DHCPCD_CONNECTION *con, bool writing, const char *txt)
     GtkWidget *edialog;
     char *t;
 
-    t = g_strconcat(_(writing ? "Error saving" : "Error reading"), " ",
+    t = g_strconcat(_(writing ? _("Error saving") : _("Error reading")), " ",
         dhcpcd_cffile(con), "\n\n", txt, NULL);
     edialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
         GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", t);
@@ -541,7 +541,7 @@ prefs_show(DHCPCDUIPlugin *dhcp)
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start(GTK_BOX(dialog_vbox), hbox, false, false, 3);
-    w = gtk_label_new("Configure:");
+    w = gtk_label_new(_("Configure:"));
     gtk_box_pack_start(GTK_BOX(hbox), w, false, false, 3);
     store = gtk_list_store_new(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);
     pb = load_icon("network-wired");

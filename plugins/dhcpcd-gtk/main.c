@@ -391,10 +391,10 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con, const char *status,
     bool refresh;
     WI_SCAN *w;
 
-    g_message("Status changed to %s", status);
+    g_message(_("Status changed to %s"), status);
     if (g_strcmp0(status, "down") == 0) {
         msg = N_(last ?
-            "Connection to dhcpcd lost" : "dhcpcd not running");
+            _("Connection to dhcpcd lost") : _("dhcpcd not running"));
         if (dhcp->ani_timer != 0) {
             g_source_remove(dhcp->ani_timer);
             dhcp->ani_timer = 0;
@@ -677,7 +677,7 @@ dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa, const char *status, gpointer p)
     WI_SCAN *w, *wn;
 
     i = dhcpcd_wpa_if(wpa);
-    g_message("%s: WPA status %s", i->ifname, status);
+    g_message(_("%s: WPA status %s"), i->ifname, status);
     if (g_strcmp0(status, "down") == 0) {
         dhcpcd_unwatch(-1, wpa, &dhcp->watches);
         TAILQ_FOREACH_SAFE(w, &dhcp->wi_scans, next, wn) {

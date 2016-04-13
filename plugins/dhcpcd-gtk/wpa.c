@@ -76,7 +76,7 @@ wpa_conf(int werr, DHCPCDUIPlugin *dhcp)
         errt = _("Failed to disconnect.");
         break;
     case DHCPCD_WPA_ERR_RECONF:
-        errt = _("Faile to reconfigure.");
+        errt = _("Failed to reconfigure.");
         break;
     case DHCPCD_WPA_ERR_SET:
         errt = _("Failed to set key management.");
