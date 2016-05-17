@@ -1,6 +1,6 @@
 /*
  * dhcpcd-gtk
- * Copyright 2009-2014 Roy Marples <roy@marples.name>
+ * Copyright 2009-2015 Roy Marples <roy@marples.name>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -199,7 +199,7 @@ update_online(DHCPCD_CONNECTION *con, bool showif, gpointer p)
     msgs = NULL;
     ifs = dhcpcd_interfaces(con);
     for (i = ifs; i; i = i->next) {
-        if (g_strcmp0(i->type, "link") == 0) {
+        if (i->type == DHT_LINK) {
             if (i->up)
                 iscarrier = true;
         } else {
@@ -221,7 +221,7 @@ update_online(DHCPCD_CONNECTION *con, bool showif, gpointer p)
             g_message("%s: %s", i->ifname, i->reason);
     }
 
-//  if (online != ison || carrier != iscarrier) {
+  if (dhcp->online != ison || dhcp->carrier != iscarrier) {
         dhcp->online = ison;
         dhcp->carrier = iscarrier;
         if (dhcp->ani_timer != 0) {
@@ -238,7 +238,16 @@ update_online(DHCPCD_CONNECTION *con, bool showif, gpointer p)
         } else {
             set_icon (dhcp->panel, dhcp->tray_icon, "network-offline", 0);
         }
-//  }
+  } else {
+        const char *icon;
+        DHCPCD_WI_SCAN *scan;
+
+        scan = get_strongest_scan(p);
+        icon = scan ? get_strength_icon_name(scan->strength.value) :
+            "network-transmit-receive";
+        set_icon (dhcp->panel, dhcp->tray_icon, icon, 0);
+  }
+
     gtk_widget_set_tooltip_text(dhcp->tray_icon, msgs);
     g_free(msgs);
 }
@@ -384,18 +393,18 @@ dhcpcd_watch(int fd,
 }
 
 static void
-dhcpcd_status_cb(DHCPCD_CONNECTION *con, const char *status,
-     gpointer p)
+dhcpcd_status_cb(DHCPCD_CONNECTION *con,
+    unsigned int status, const char *status_msg, gpointer p)
 {
     DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) p;
-    static char *last = NULL;
+    static unsigned int last = DHC_UNKNOWN;
     const char *msg;
     bool refresh;
     WI_SCAN *w;
 
-    g_message(_("Status changed to %s"), status);
-    if (g_strcmp0(status, "down") == 0) {
-        msg = N_(last ?
+    g_message(_("Status changed to %s"), status_msg);
+    if (status == DHC_DOWN) {
+        msg = N_(last == DHC_UNKNOWN ?
             _("Connection to dhcpcd lost") : _("dhcpcd not running"));
         if (dhcp->ani_timer != 0) {
             g_source_remove(dhcp->ani_timer);
@@ -417,17 +426,16 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con, const char *status,
         if (!dhcp->reopen_timer)
             dhcp->reopen_timer = g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
     } else {
-        if ((last == NULL || g_strcmp0(last, "down") == 0)) {
+        if (last == DHC_UNKNOWN || last == DHC_DOWN) {
             g_message(_("Connected to %s-%s"), "dhcpcd",
                 dhcpcd_version(con));
             refresh = true;
         } else
-            refresh = g_strcmp0(last, "opened") ? false : true;
+            refresh = last == DHC_OPENED ? true : false;
         update_online(con, refresh, dhcp->plugin);
     }
 
-    g_free(last);
-    last = g_strdup(status);
+    last = status;
 }
 
 static gboolean
@@ -492,10 +500,9 @@ dhcpcd_if_cb(DHCPCD_IF *i, gpointer p)
     bool new_msg;
 
     /* We should ignore renew and stop so we don't annoy the user */
-    if (g_strcmp0(i->reason, "RENEW") &&
-        g_strcmp0(i->reason, "STOP") &&
-        g_strcmp0(i->reason, "STOPPED") &&
-        g_strcmp0(i->reason, "ROUTERADVERT"))
+    if (i->state != DHS_RENEW &&
+        i->state != DHS_STOP && i->state != DHS_STOPPED &&
+        i->state != DHS_ROUTERADVERT)
     {
         msg = dhcpcd_if_message(i, &new_msg);
         if (msg) {
@@ -548,8 +555,7 @@ dhcpcd_wpa_cb(_unused GIOChannel *gio, _unused GIOCondition c,
         /* If the interface hasn't left, try re-opening */
         i = dhcpcd_wpa_if(wpa);
         if (i == NULL ||
-            g_strcmp0(i->reason, "DEPARTED") == 0 ||
-            g_strcmp0(i->reason, "STOPPED") == 0)
+            i->state == DHS_DEPARTED || i->state == DHS_STOPPED)
             return TRUE;
         g_warning(_("dhcpcd WPA connection lost: %s"), i->ifname);
         if (!dhcp->wpa_reopen_timer)
@@ -672,15 +678,16 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, gpointer p)
 }
 
 static void
-dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa, const char *status, gpointer p)
+dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa,
+    unsigned int status, const char *status_msg, gpointer p)
 {
     DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) p;
     DHCPCD_IF *i;
     WI_SCAN *w, *wn;
 
     i = dhcpcd_wpa_if(wpa);
-    g_message(_("%s: WPA status %s"), i->ifname, status);
-    if (g_strcmp0(status, "down") == 0) {
+    g_message(_("%s: WPA status %s"), i->ifname, status_msg);
+    if (status == DHC_DOWN) {
         dhcpcd_unwatch(-1, wpa, &dhcp->watches);
         TAILQ_FOREACH_SAFE(w, &dhcp->wi_scans, next, wn) {
             if (w->interface == i) {
@@ -693,7 +700,6 @@ dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa, const char *status, gpointer p)
     }
 }
 
-#ifdef BG_SCAN
 static gboolean
 bgscan(gpointer data)
 {
@@ -704,14 +710,15 @@ bgscan(gpointer data)
     TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
         if (dhcpcd_is_wireless(w->interface)) {
             wpa = dhcpcd_wpa_find(dhcp->con, w->interface->ifname);
-            if (wpa)
+            if (wpa &&
+                (!w->interface->up ||
+                dhcpcd_wpa_can_background_scan(wpa)))
                 dhcpcd_wpa_scan(wpa);
         }
     }
 
     return TRUE;
 }
-#endif
 
 static gboolean dhcpcdui_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
 {
@@ -826,10 +833,8 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     if (dhcpcd_try_open (dhcp))
         dhcp->reopen_timer = g_timeout_add (DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
 
-#ifdef BG_SCAN
     /* Start background scanning */
     dhcp->defscan_timer = g_timeout_add (DHCPCD_WPA_SCAN_LONG, bgscan, dhcp);
-#endif
 
     /* Show the widget, and return. */
     gtk_widget_show_all (p);

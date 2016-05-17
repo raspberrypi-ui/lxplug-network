@@ -1,6 +1,6 @@
 /*
  * dhcpcd-gtk
- * Copyright 2009-2014 Roy Marples <roy@marples.name>
+ * Copyright 2009-2015 Roy Marples <roy@marples.name>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,14 +28,12 @@
 #include "dhcpcd-gtk.h"
 
 #if 0
-static const char *copyright = "Copyright (c) 2009-2014 Roy Marples";
+static const char *copyright = "Copyright (c) 2009-2015 Roy Marples";
 
 static GtkStatusIcon *sicon;
 static GtkWidget *menu;
 static GtkAboutDialog *about;
-#ifdef BG_SCAN
 static guint bgscan_timer;
-#endif
 
 static void
 on_pref(_unused GObject *o, gpointer data)
@@ -211,7 +209,9 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     if (scan->wpa_flags[0] == '\0')
         gtk_widget_set_tooltip_text(wim->menu, scan->bssid);
     else {
-        char *tip = g_strconcat(scan->bssid, " ", scan->wpa_flags, NULL);
+        char *tip;
+
+        tip = g_strconcat(scan->bssid, " ", scan->wpa_flags, NULL);
         gtk_widget_set_tooltip_text(wim->menu, tip);
         g_free(tip);
     }
@@ -337,7 +337,7 @@ add_scans(WI_SCAN *wi, GtkWidget *p)
     {
         m = gtk_menu_new ();
         wi->noap = gtk_menu_item_new_with_label (_("No APs found - scanning..."));
-	gtk_widget_set_sensitive (wi->noap, FALSE);
+        gtk_widget_set_sensitive (wi->noap, FALSE);
         gtk_menu_shell_append(GTK_MENU_SHELL(m), wi->noap);
         return m;
     }
@@ -381,12 +381,10 @@ menu_abort(DHCPCDUIPlugin *data)
     WI_SCAN *wis;
     WI_MENU *wim;
 
-#ifdef BG_SCAN
     if (data->bgscan_timer) {
         g_source_remove(data->bgscan_timer);
         data->bgscan_timer = 0;
     }
-#endif
 
     TAILQ_FOREACH(wis, &data->wi_scans, next) {
         wis->ifmenu = NULL;
@@ -406,7 +404,6 @@ menu_abort(DHCPCDUIPlugin *data)
     }
 }
 
-#ifdef BG_SCAN
 static gboolean
 menu_bgscan(gpointer data)
 {
@@ -422,14 +419,15 @@ menu_bgscan(gpointer data)
     TAILQ_FOREACH(w, &dhcp->wi_scans, next) {
         if (dhcpcd_is_wireless(w->interface)) {
             wpa = dhcpcd_wpa_find(dhcpcd_if_connection (w->interface), w->interface->ifname);
-            if (wpa)
+            if (wpa &&
+                (!w->interface->up ||
+                dhcpcd_wpa_can_background_scan(wpa)))
                 dhcpcd_wpa_scan(wpa);
         }
     }
 
     return TRUE;
 }
-#endif
 
 static void dhcpcdui_popup_set_position(GtkMenu * menu, gint * px, gint * py, gboolean * push_in, gpointer data)
 {
@@ -567,17 +565,17 @@ on_activate(GtkStatusIcon *icon)
 
     if ((l = TAILQ_LAST(&wi_scans, wi_scan_head)) && l != w) {
         menu = gtk_menu_new();
-        TAILQ_FOREACH(w, &wi_scans, next) {
+        TAILQ_FOREACH(l, &wi_scans, next) {
             item = gtk_image_menu_item_new_with_label(
-                w->interface->ifname);
+                l->interface->ifname);
             image = gtk_image_new_from_icon_name(
                 "network-wireless", GTK_ICON_SIZE_MENU);
             gtk_image_menu_item_set_image(
                 GTK_IMAGE_MENU_ITEM(item), image);
             gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-            w->ifmenu = add_scans(w);
+            l->ifmenu = add_scans(l);
             gtk_menu_item_set_submenu(GTK_MENU_ITEM(item),
-                w->ifmenu);
+                l->ifmenu);
         }
     } else {
         w->ifmenu = menu = add_scans(w);
@@ -589,10 +587,8 @@ on_activate(GtkStatusIcon *icon)
             gtk_status_icon_position_menu, icon,
             1, gtk_get_current_event_time());
 
-#ifdef BG_SCAN
         bgscan_timer = g_timeout_add(DHCPCD_WPA_SCAN_SHORT,
             menu_bgscan, NULL);
-#endif
     }
 }
 
@@ -612,7 +608,7 @@ on_popup(GtkStatusIcon *icon, guint button, guint32 atime, gpointer data)
     image = gtk_image_new_from_icon_name("preferences-system-network",
         GTK_ICON_SIZE_MENU);
     gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item), image);
-    if (g_strcmp0(dhcpcd_status(con), "down") == 0)
+    if (dhcpcd_status(con, NULL) == DHC_DOWN)
         gtk_widget_set_sensitive(item, false);
     else
         g_signal_connect(G_OBJECT(item), "activate",

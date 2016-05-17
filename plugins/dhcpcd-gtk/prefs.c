@@ -1,6 +1,6 @@
 /*
  * dhcpcd-gtk
- * Copyright 2009-2014 Roy Marples <roy@marples.name>
+ * Copyright 2009-2015 Roy Marples <roy@marples.name>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -65,7 +65,7 @@ show_config(DHCPCD_OPTION *conf, DHCPCDUIPlugin *dhcp)
         autocnf = false;
     else {
         if ((val = dhcpcd_config_get(conf, "inform")) == NULL &&
-            (dhcp->iface && dhcp->iface->flags & IFF_POINTOPOINT))
+            (dhcp->iface && dhcp->iface->ifflags & IFF_POINTOPOINT))
             autocnf = false;
         else
             autocnf = true;
@@ -130,7 +130,7 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
 
     ret = true;
     a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->autoconf));
-    if (dhcp->iface && dhcp->iface->flags & IFF_POINTOPOINT)
+    if (dhcp->iface && dhcp->iface->ifflags & IFF_POINTOPOINT)
         set_option(conf, true, "ip_address=", a ? NULL : ns, &ret);
     else {
         val = gtk_entry_get_text(GTK_ENTRY(dhcp->address));
@@ -335,7 +335,7 @@ names_on_change(_unused GtkWidget *widget, gpointer data)
             }
     }
     gtk_widget_set_sensitive(dhcp->address,
-        !dhcp->iface || (dhcp->iface->flags & IFF_POINTOPOINT) == 0);
+        !dhcp->iface || (dhcp->iface->ifflags & IFF_POINTOPOINT) == 0);
     if (dhcp->block && dhcp->name) {
         errno = 0;
         dhcp->config = dhcpcd_config_read(con, dhcp->block, dhcp->name);
@@ -522,7 +522,7 @@ prefs_show(DHCPCDUIPlugin *dhcp)
     //  return;
     //}
 
-    if (g_strcmp0(dhcpcd_status(dhcp->con), "down") == 0)
+    if (dhcpcd_status(dhcp->con, NULL) == DHC_DOWN)
         return NULL;
 
     dhcp->dialog = gtk_dialog_new();
