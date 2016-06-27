@@ -104,6 +104,28 @@ wpa_conf(int werr, DHCPCDUIPlugin *dhcp)
     return false;
 }
 
+bool wpa_disconnect (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
+{
+	DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) dhcpcd_wpa_get_context (wpa);
+    int id = dhcpcd_wpa_network_find_new (wpa, scan->ssid);
+    if (id == -1)
+    {
+        wpa_show_err (_("Error disconnecting network"), _("Could not find SSID to disconnect"), dhcp);
+        return false;
+    }
+	if (!dhcpcd_wpa_network_remove (wpa, id))
+    {
+        wpa_show_err (_("Error disconnecting network"), _("Could not find remove network"), dhcp);
+        return false;
+    }
+	if (!dhcpcd_wpa_config_write(wpa))
+    {
+        wpa_show_err (_("Error disconnecting network"), _("Could not write configuration"), dhcp);
+        return false;
+    }
+	return true;
+}
+
 bool
 wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
 {

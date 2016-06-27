@@ -85,7 +85,12 @@ ssid_hook(GtkMenuItem *item, GtkWidget *p)
 
             wpa = dhcpcd_wpa_find(con, wi->interface->ifname);
             if (wpa)
-                wpa_configure(wpa, scan);
+            {
+                if (dhcpcd_wi_associated(wi->interface, scan))
+                    wpa_disconnect(wpa, scan);
+                else
+                    wpa_configure(wpa, scan);
+            }
         }
     }
 }

@@ -135,6 +135,7 @@ void menu_abort(DHCPCDUIPlugin *);
 void wpa_abort(DHCPCDUIPlugin *);
 
 bool wpa_configure(DHCPCD_WPA *, DHCPCD_WI_SCAN *);
+bool wpa_disconnect (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan);
 
 #if GTK_MAJOR_VERSION == 2
 GtkWidget *gtk_box_new(GtkOrientation, gint);
