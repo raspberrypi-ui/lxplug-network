@@ -419,7 +419,31 @@ static void dhcpcdui_popup_set_position(GtkMenu * menu, gint * px, gint * py, gb
     *push_in = TRUE;
 }
 
+static int wifi_enabled (void)
+{
+    FILE *fp;
 
+    // is rfkill installed?
+    fp = popen ("test -e /usr/sbin/rfkill", "r");
+    if (pclose (fp)) return -2;
+
+    // is there wifi hardware that rfkill can see?
+    fp = popen ("rfkill list wifi | grep -q blocked", "r");
+    if (pclose (fp)) return -1;
+
+    // is rfkill blocking wifi?
+    fp = popen ("rfkill list wifi | grep -q 'Soft blocked: no'", "r");
+    if (!pclose (fp)) return 1;
+    return 0;
+}
+
+static void toggle_wifi (_unused GObject *o, _unused gpointer data)
+{
+    if (wifi_enabled ())
+        system ("sudo rfkill block wifi");
+    else
+        system ("sudo rfkill unblock wifi");
+}
 
 void
 menu_show (DHCPCDUIPlugin *data)
@@ -432,6 +456,26 @@ menu_show (DHCPCDUIPlugin *data)
     prefs_abort(data);
     menu_abort(data);
 
+    int wifi_state = wifi_enabled ();
+
+    if (wifi_state == -1)
+    {
+        // rfkill is installed, but no hardware found
+        data->menu = gtk_menu_new ();
+        item = gtk_menu_item_new_with_label (_("No wireless interfaces found"));
+        gtk_widget_set_sensitive (item, FALSE);
+        gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+    }
+    else if (wifi_state == 0)
+    {
+        // rfkill installed, h/w found, disabled
+        data->menu = gtk_menu_new ();
+        item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
+        g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
+        gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+    }
+    else
+    {
     if ((w = TAILQ_FIRST(&data->wi_scans)) == NULL)
     {
         data->menu = gtk_menu_new ();
@@ -439,8 +483,9 @@ menu_show (DHCPCDUIPlugin *data)
         gtk_widget_set_sensitive (item, FALSE);
         gtk_menu_shell_append (GTK_MENU_SHELL(data->menu), item);
     }
-
-    else if ((l = TAILQ_LAST(&data->wi_scans, wi_scan_head)) && l != w) {
+    else
+    {
+    if ((l = TAILQ_LAST(&data->wi_scans, wi_scan_head)) && l != w) {
         data->menu = gtk_menu_new();
         TAILQ_FOREACH(w, &data->wi_scans, next) {
             item = gtk_image_menu_item_new_with_label(
@@ -456,6 +501,18 @@ menu_show (DHCPCDUIPlugin *data)
         }
     } else {
         w->ifmenu = data->menu = add_scans(w, data->plugin);
+    }
+
+            if (wifi_state == 1)
+            {
+                // rfkill installed, h/w found, enabled
+                item = gtk_separator_menu_item_new ();
+                gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+                item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
+                g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
+                gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+            }
+        }
     }
 
     if (data->menu) {
