@@ -68,6 +68,27 @@ wi_scan_find(DHCPCD_WI_SCAN *scan, GtkWidget *p)
     return NULL;
 }
 
+static void disconnect_prompt (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
+{
+    GtkWidget *dlg, *lbl;
+    char buffer[256];
+    int res;
+
+    sprintf (buffer, _("Do you want to disconnect from the Wi-Fi network '%s'?"), scan->ssid);
+    dlg = gtk_dialog_new_with_buttons (_("Disconnect Wi-Fi Network"), NULL, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, 0, GTK_STOCK_OK, 1, NULL);
+    lbl = gtk_label_new (buffer);
+    gtk_label_set_line_wrap (GTK_LABEL (lbl), TRUE);
+    gtk_label_set_justify (GTK_LABEL (lbl), GTK_JUSTIFY_LEFT);
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0.0, 0.0);
+    gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), lbl , TRUE, TRUE, 0);
+    gtk_widget_show_all (dlg);
+
+    // block while waiting for user response
+    res = gtk_dialog_run (GTK_DIALOG (dlg));
+    gtk_widget_destroy (dlg);
+    if (res) wpa_disconnect(wpa, scan);
+}
+
 static void
 ssid_hook(GtkMenuItem *item, GtkWidget *p)
 {
@@ -87,7 +108,7 @@ ssid_hook(GtkMenuItem *item, GtkWidget *p)
             if (wpa)
             {
                 if (dhcpcd_wi_associated(wi->interface, scan))
-                    wpa_disconnect(wpa, scan);
+                    disconnect_prompt (wpa, scan);
                 else
                     wpa_configure(wpa, scan);
             }
