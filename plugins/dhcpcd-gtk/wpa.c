@@ -115,7 +115,7 @@ bool wpa_disconnect (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
     }
 	if (!dhcpcd_wpa_network_remove (wpa, id))
     {
-        wpa_show_err (_("Error disconnecting network"), _("Could not find remove network"), dhcp);
+        wpa_show_err (_("Error disconnecting network"), _("Could not remove network"), dhcp);
         return false;
     }
 	if (!dhcpcd_wpa_config_write(wpa))
