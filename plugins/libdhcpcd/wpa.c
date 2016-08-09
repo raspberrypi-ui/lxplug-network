@@ -1229,3 +1229,4 @@ void *dhcpcd_wpa_get_context (DHCPCD_WPA *wpa)
 {
     return wpa->context;
 }
+
