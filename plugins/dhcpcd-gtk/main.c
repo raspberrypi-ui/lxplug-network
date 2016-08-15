@@ -221,7 +221,7 @@ update_online(DHCPCD_CONNECTION *con, bool showif, gpointer p)
             g_message("%s: %s", i->ifname, i->reason);
     }
 
-  if (dhcp->online != ison || dhcp->carrier != iscarrier) {
+  if (dhcp->online != ison || dhcp->carrier != iscarrier || (!dhcp->online && !dhcp->carrier)) {
         dhcp->online = ison;
         dhcp->carrier = iscarrier;
         if (dhcp->ani_timer != 0) {
@@ -239,16 +239,12 @@ update_online(DHCPCD_CONNECTION *con, bool showif, gpointer p)
             set_icon (dhcp->panel, dhcp->tray_icon, "network-offline", 0);
         }
   } else {
-        if (!dhcp->online && !dhcp->carrier) set_icon (dhcp->panel, dhcp->tray_icon, "network-offline", 0);
-		else
-		{
-			const char *icon;
-			DHCPCD_WI_SCAN *scan;
-			scan = get_strongest_scan(p);
-			icon = scan ? get_strength_icon_name(scan->strength.value) :
-				"network-transmit-receive";
-			set_icon (dhcp->panel, dhcp->tray_icon, icon, 0);
-		}
+		const char *icon;
+		DHCPCD_WI_SCAN *scan;
+		scan = get_strongest_scan(p);
+		icon = scan ? get_strength_icon_name(scan->strength.value) :
+			"network-transmit-receive";
+		set_icon (dhcp->panel, dhcp->tray_icon, icon, 0);
   }
 
     gtk_widget_set_tooltip_text(dhcp->tray_icon, msgs);
