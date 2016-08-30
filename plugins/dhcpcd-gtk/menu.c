@@ -143,6 +143,24 @@ is_associated(WI_SCAN *wi, DHCPCD_WI_SCAN *scan)
     return dhcpcd_wi_associated(wi->interface, scan);
 }
 
+static bool
+get_security_icon(int flags, const char **icon)
+{
+	bool active;
+
+	active = true;
+	if (flags & WSF_SECURE) {
+		if (flags & WSF_PSK)
+			*icon = "network-wireless-encrypted";
+		else {
+			*icon = "network-error";
+			active = false;
+		}
+	} else
+		*icon = "";
+	return active;
+}
+
 static void
 update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
 {
@@ -186,6 +204,7 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     WI_MENU *wim;
     GtkWidget *box;
     const char *icon;
+    bool active;
 
     wim = g_malloc(sizeof(*wim));
     wim->scan = scan;
@@ -198,7 +217,8 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     gtk_box_pack_start(GTK_BOX(box), wim->ssid, TRUE, TRUE, 0);
 
     wim->icon = gtk_image_new ();
-    if (scan->flags & WSF_SECURE) set_icon (dhcp->panel, wim->icon, "network-wireless-encrypted", 16);
+    active = get_security_icon (scan->flags, &icon);
+    set_icon (dhcp->panel, wim->icon, icon, 16);
     gtk_box_pack_start(GTK_BOX(box), wim->icon, FALSE, FALSE, 0);
 
     wim->strength = gtk_image_new ();
@@ -217,6 +237,9 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     }
 #endif
     update_item(wis, wim, scan, dhcp);
+
+    if (gtk_widget_get_sensitive (wim->menu) != active)
+        gtk_widget_set_sensitive (wim->menu, active);
 
     g_signal_connect(G_OBJECT(wim->menu), "activate",
         G_CALLBACK(ssid_hook), p);
