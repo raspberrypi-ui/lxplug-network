@@ -209,6 +209,7 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     wim = g_malloc(sizeof(*wim));
     wim->scan = scan;
     wim->menu = gtk_image_menu_item_new();
+    gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (wim->menu), TRUE);
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
     gtk_container_add(GTK_CONTAINER(wim->menu), box);
 
@@ -532,6 +533,7 @@ menu_show (DHCPCDUIPlugin *data)
         TAILQ_FOREACH(w, &data->wi_scans, next) {
             item = gtk_image_menu_item_new_with_label(
                 w->interface->ifname);
+            gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (item), TRUE);
             image = gtk_image_new ();
             set_icon (data->panel, image, "network-wireless", 16);
             gtk_image_menu_item_set_image(
@@ -591,6 +593,7 @@ on_activate(GtkStatusIcon *icon)
         TAILQ_FOREACH(l, &wi_scans, next) {
             item = gtk_image_menu_item_new_with_label(
                 l->interface->ifname);
+            gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (item), TRUE);
             image = gtk_image_new_from_icon_name(
                 "network-wireless", GTK_ICON_SIZE_MENU);
             gtk_image_menu_item_set_image(
