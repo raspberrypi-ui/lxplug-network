@@ -844,7 +844,7 @@ FM_DEFINE_MODULE(lxpanel_gtk, dhcpcdui)
 
 /* Plugin descriptor. */
 LXPanelPluginInit fm_module_init_lxpanel_gtk = {
-    .name = N_("WiFi Networks (dhcpcdui)"),
+    .name = N_("Wireless & Wired Network"),
     .description = N_("Control for dhcpcd network interface"),
     .new_instance = dhcpcdui_constructor,
     .config = dhcpcdui_configure,
