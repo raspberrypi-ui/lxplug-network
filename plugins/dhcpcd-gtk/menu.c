@@ -471,11 +471,11 @@ static int wifi_enabled (void)
     if (pclose (fp)) return -2;
 
     // is there wifi hardware that rfkill can see?
-    fp = popen ("rfkill list wifi | grep -q blocked", "r");
+    fp = popen ("/usr/sbin/rfkill list wifi | grep -q blocked", "r");
     if (pclose (fp)) return -1;
 
     // is rfkill blocking wifi?
-    fp = popen ("rfkill list wifi | grep -q 'Soft blocked: no'", "r");
+    fp = popen ("/usr/sbin/rfkill list wifi | grep -q 'Soft blocked: no'", "r");
     if (!pclose (fp)) return 1;
     return 0;
 }
@@ -483,9 +483,9 @@ static int wifi_enabled (void)
 static void toggle_wifi (_unused GObject *o, _unused gpointer data)
 {
     if (wifi_enabled ())
-        system ("sudo rfkill block wifi");
+        system ("sudo /usr/sbin/rfkill block wifi");
     else
-        system ("sudo rfkill unblock wifi");
+        system ("sudo /usr/sbin/rfkill unblock wifi");
 }
 
 void
