@@ -1,0 +1,5 @@
+[encoding: UTF-8]
+plugins/dhcpcd-gtk/main.c
+plugins/dhcpcd-gtk/menu.c
+plugins/dhcpcd-gtk/prefs.c
+plugins/dhcpcd-gtk/wpa.c

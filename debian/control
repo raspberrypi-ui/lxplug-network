@@ -1,0 +1,18 @@
+Source: lxplug-network
+Section: x11
+Priority: optional
+Maintainer: Simon Long <simon@raspberrypi.org>
+Build-Depends:
+ debhelper (>= 9), dh-autoreconf, intltool, libgtk2.0-dev (>= 2.18), 
+ libiw-dev [linux-any], libmenu-cache-dev | libmenu-cache1-dev,
+ libwnck-dev, libfm-gtk-dev (>= 1.2.0) 
+Homepage: http://raspberrypi.org/
+
+Package: lxplug-network
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, lxmenu-data,
+ lxpanel, lxpanel-data, libfm-modules
+Recommends:
+Description: Network plugin for lxpanel
+ Plugin for lxpanel ported from dhcpcd-ui to control connection to
+ wireless and wired networks.
