@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Perform regular network scans */
+#undef BG_SCAN
+
 /* Disable menu related routines */
 #undef DISABLE_MENU
 
@@ -11,6 +14,9 @@
 
 /* Gettext package. */
 #undef GETTEXT_PACKAGE
+
+/* Has gettext function */
+#undef HAS_GETTEXT
 
 /* Define to 1 if you have the <alsa/asoundlib.h> header file. */
 #undef HAVE_ALSA_ASOUNDLIB_H
@@ -80,6 +86,9 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
+/* Has strversmp function */
+#undef HAVE_STRVERSCMP
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -147,3 +156,6 @@
 
 /* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc
+
+/* Replacement strlcpy function */
+#undef strlcpy
