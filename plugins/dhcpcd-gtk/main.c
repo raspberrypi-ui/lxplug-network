@@ -1,3 +1,6 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 /*
  * dhcpcd-gtk
  * Copyright 2009-2015 Roy Marples <roy@marples.name>
@@ -37,7 +40,6 @@
 static NotifyNotification *nn;
 #endif
 
-#include "config.h"
 #include "dhcpcd.h"
 #include "dhcpcd-gtk.h"
 
@@ -790,10 +792,12 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     DHCPCDUIPlugin * dhcp = g_new0 (DHCPCDUIPlugin, 1);
     GtkWidget *p;
 
+#ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
-    bindtextdomain (PACKAGE, NULL);
-    bind_textdomain_codeset (PACKAGE, "UTF-8");
-    textdomain (PACKAGE);
+    bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
+    bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
+    textdomain ( GETTEXT_PACKAGE );
+#endif
 
     dhcp->tray_icon = gtk_image_new ();
     set_icon (panel, dhcp->tray_icon, "network-offline", 0);
