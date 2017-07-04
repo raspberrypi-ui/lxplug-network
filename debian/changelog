@@ -1,3 +1,9 @@
+lxplug-network (0.2) stretch; urgency=medium
+
+  * Remove unnecessary sudo from rfkill commands
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 04 Jul 2017 10:20:56 +0100
+
 lxplug-network (0.1) stretch; urgency=medium
 
   * Initial release.

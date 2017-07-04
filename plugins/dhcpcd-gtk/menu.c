@@ -483,9 +483,9 @@ static int wifi_enabled (void)
 static void toggle_wifi (_unused GObject *o, _unused gpointer data)
 {
     if (wifi_enabled ())
-        system ("sudo /usr/sbin/rfkill block wifi");
+        system ("/usr/sbin/rfkill block wifi");
     else
-        system ("sudo /usr/sbin/rfkill unblock wifi");
+        system ("/usr/sbin/rfkill unblock wifi");
 }
 
 void
