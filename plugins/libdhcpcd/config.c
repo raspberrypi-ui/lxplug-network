@@ -325,7 +325,7 @@ config(DHCPCD_CONNECTION *con, int action, const char *block, const char *name,
 			goto exit;
 		}
 		if (line == NULL || *line == '\0')
-			o->value = NULL;
+			o->value = strdup("");
 		else {
 			o->value = strdup(line);
 			if (o->value == NULL)

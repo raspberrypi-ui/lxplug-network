@@ -1,3 +1,9 @@
+lxplug-network (0.3) stretch; urgency=medium
+
+  * Modify preferences dialog for compatibility with IPv6
+
+ -- Simon Long <simon@raspberrypi.org>  Thu, 14 Sep 2017 15:01:05 +0100
+
 lxplug-network (0.2) stretch; urgency=medium
 
   * Remove unnecessary sudo from rfkill commands

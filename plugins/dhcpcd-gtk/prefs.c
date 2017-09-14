@@ -81,6 +81,8 @@ show_config(DHCPCD_OPTION *conf, DHCPCDUIPlugin *dhcp)
     gtk_entry_set_text(GTK_ENTRY(dhcp->dns_servers), val ? val : "");
     val = dhcpcd_config_get_static(conf, "domain_search=");
     gtk_entry_set_text(GTK_ENTRY(dhcp->dns_search), val ? val : "");
+    val = dhcpcd_config_get(conf, "noipv6rs");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dhcp->noipv6rs), val != NULL);
 }
 
 static char *
@@ -131,6 +133,8 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
     bool a, ret;
 
     ret = true;
+    a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->noipv6rs));
+    set_option(conf, false, "noipv6rs", a ? ns : NULL, &ret);
     a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->autoconf));
     if (dhcp->iface && dhcp->iface->ifflags & IFF_POINTOPOINT)
         set_option(conf, true, "ip_address=", a ? NULL : ns, &ret);
@@ -168,7 +172,6 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
 static bool
 write_config(DHCPCD_CONNECTION *con, DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
 {
-
     if (make_config(conf, dhcp) &&
         !dhcpcd_config_write(con, dhcp->block, dhcp->name, *conf))
     {
@@ -616,6 +619,9 @@ prefs_show(DHCPCDUIPlugin *dhcp)
     dhcp->autoconf = gtk_check_button_new_with_label(
         _("Automatically configure empty options"));
     gtk_box_pack_start(GTK_BOX(vbox), dhcp->autoconf, false, false, 3);
+    dhcp->noipv6rs = gtk_check_button_new_with_label(
+        _("Disable IPv6 auto-configuration"));
+    gtk_box_pack_start(GTK_BOX(vbox), dhcp->noipv6rs, false, false, 3);
     table = gtk_table_new(6, 2, false);
     gtk_box_pack_start(GTK_BOX(dhcp->controls), table, false, false, 0);
 
