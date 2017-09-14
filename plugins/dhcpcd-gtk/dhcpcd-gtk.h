@@ -108,7 +108,7 @@ typedef struct {
 
     /* Preference dialog */
     GtkWidget *dialog, *blocks, *names, *controls, *clear, *rebind;
-    GtkWidget *autoconf, *address, *router, *dns_servers, *dns_search;
+    GtkWidget *autoconf, *address, *address6, *router, *dns_servers, *dns_search;
     DHCPCD_OPTION *config;
     char *block, *name;
     DHCPCD_IF *iface;

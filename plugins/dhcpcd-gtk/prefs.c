@@ -58,20 +58,23 @@ config_err_dialog(DHCPCD_CONNECTION *con, bool writing, const char *txt)
 static void
 show_config(DHCPCD_OPTION *conf, DHCPCDUIPlugin *dhcp)
 {
-    const char *val;
-    bool autocnf;
+    const char *val, *val6;
+    bool autocnf = true;
 
     if ((val = dhcpcd_config_get_static(conf, "ip_address=")) != NULL)
         autocnf = false;
-    else {
-        if ((val = dhcpcd_config_get(conf, "inform")) == NULL &&
+    if ((val6 = dhcpcd_config_get_static(conf, "ip6_address=")) != NULL)
+        autocnf = false;
+    if (autocnf == true) {
+        val = dhcpcd_config_get(conf, "inform");
+        val6 = dhcpcd_config_get(conf, "inform6");
+        if (val == NULL && val6 == NULL &&
             (dhcp->iface && dhcp->iface->ifflags & IFF_POINTOPOINT))
             autocnf = false;
-        else
-            autocnf = true;
     }
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dhcp->autoconf), autocnf);
     gtk_entry_set_text(GTK_ENTRY(dhcp->address), val ? val : "");
+    gtk_entry_set_text(GTK_ENTRY(dhcp->address6), val6 ? val6 : "");
     val = dhcpcd_config_get_static(conf, "routers=");
     gtk_entry_set_text(GTK_ENTRY(dhcp->router), val ? val : "");
     val = dhcpcd_config_get_static(conf, "domain_name_servers=");
@@ -102,7 +105,6 @@ static bool
 set_option(DHCPCD_OPTION **conf, bool s, const char *opt, const char *val,
     bool *ret)
 {
-
     if (s) {
         if (!dhcpcd_config_set_static(conf, opt, val))
             g_critical("dhcpcd_config_set_static: %s",
@@ -138,6 +140,11 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
             val = NULL;
         set_option(conf, false, "inform", a ? val : NULL, &ret);
         set_option(conf, true, "ip_address=", a ? NULL : val, &ret);
+        val = gtk_entry_get_text(GTK_ENTRY(dhcp->address6));
+        if (*val == '\0')
+            val = NULL;
+        set_option(conf, false, "inform6", a ? val : NULL, &ret);
+        set_option(conf, true, "ip6_address=", a ? NULL : val, &ret);
     }
 
     val = gtk_entry_get_text(GTK_ENTRY(dhcp->router));
@@ -336,6 +343,8 @@ names_on_change(_unused GtkWidget *widget, gpointer data)
     }
     gtk_widget_set_sensitive(dhcp->address,
         !dhcp->iface || (dhcp->iface->ifflags & IFF_POINTOPOINT) == 0);
+    gtk_widget_set_sensitive(dhcp->address6,
+        !dhcp->iface || (dhcp->iface->ifflags & IFF_POINTOPOINT) == 0);
     if (dhcp->block && dhcp->name) {
         errno = 0;
         dhcp->config = dhcpcd_config_read(con, dhcp->block, dhcp->name);
@@ -354,13 +363,14 @@ names_on_change(_unused GtkWidget *widget, gpointer data)
     gtk_widget_set_sensitive(dhcp->rebind, dhcp->name ? true : false);
 }
 
-static bool
+static int
 valid_address(const char *val, bool allow_cidr)
 {
     char *addr, *p, *e;
     struct in_addr in;
-    gint64 cidr;
-    bool retval;
+    gint64 cidr = 0;
+    int retval;
+    char buf[16];
 
     addr = g_strdup(val);
     if (allow_cidr) {
@@ -370,15 +380,21 @@ valid_address(const char *val, bool allow_cidr)
             errno = 0;
             e = NULL;
             cidr = g_ascii_strtoll(p, &e, 10);
-            if (cidr < 0 || cidr > 32 ||
+            if (cidr < 0 || cidr > 64 ||
                 errno != 0 || *e != '\0')
             {
-                retval = false;
+                retval = 0;
                 goto out;
             }
         }
     }
-    retval = inet_aton(addr, &in) == 0 ? false : true;
+    if (inet_aton (addr, &in))
+    {
+         if (cidr > 32) retval = 0;
+         else retval = 1;
+         goto out;
+    }
+    retval = inet_pton (AF_INET6, addr, buf) == 0 ? 0 : 2;
 
 out:
     g_free(addr);
@@ -386,12 +402,23 @@ out:
 }
 
 static bool
-address_lost_focus(GtkEntry *entry)
+address4_lost_focus(GtkEntry *entry)
 {
     const char *val;
 
     val = gtk_entry_get_text(entry);
-    if (*val != '\0' && !valid_address(val, true))
+    if (*val != '\0' && valid_address(val, true) != 1)
+        gtk_entry_set_text(entry, "");
+    return false;
+}
+
+static bool
+address6_lost_focus(GtkEntry *entry)
+{
+    const char *val;
+
+    val = gtk_entry_get_text(entry);
+    if (*val != '\0' && valid_address(val, true) != 2)
         gtk_entry_set_text(entry, "");
     return false;
 }
@@ -602,17 +629,25 @@ prefs_show(DHCPCDUIPlugin *dhcp)
     gtk_table_attach(GTK_TABLE(table), a, b, c, d, e,             \
         GTK_EXPAND | GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 3, 3);
 
-    w = gtk_label_new(_("IP Address:"));
+    w = gtk_label_new(_("IPv4 Address:"));
     dhcp->address = gtk_entry_new();
     gtk_entry_set_max_length(GTK_ENTRY(dhcp->address), 18);
     g_signal_connect(G_OBJECT(dhcp->address), "focus-out-event",
-        G_CALLBACK(address_lost_focus), NULL);
+        G_CALLBACK(address4_lost_focus), NULL);
     attach_label(w, 0, 1, 0, 1);
     attach_entry(dhcp->address, 1, 2, 0, 1);
 
+    w = gtk_label_new(_("IPv6 Address:"));
+    dhcp->address6 = gtk_entry_new();
+    gtk_entry_set_max_length(GTK_ENTRY(dhcp->address6), 42);
+    g_signal_connect(G_OBJECT(dhcp->address6), "focus-out-event",
+        G_CALLBACK(address6_lost_focus), NULL);
+    attach_label(w, 0, 1, 1, 2);
+    attach_entry(dhcp->address6, 1, 2, 1, 2);
+
     w = gtk_label_new(_("Router:"));
     dhcp->router = gtk_entry_new();
-    gtk_entry_set_max_length(GTK_ENTRY(dhcp->router), 15);
+    gtk_entry_set_max_length(GTK_ENTRY(dhcp->router), 39);
     g_signal_connect(G_OBJECT(dhcp->router), "focus-out-event",
         G_CALLBACK(entry_lost_focus), NULL);
     attach_label(w, 0, 1, 2, 3);
