@@ -58,29 +58,28 @@ config_err_dialog(DHCPCD_CONNECTION *con, bool writing, const char *txt)
 static void
 show_config(DHCPCD_OPTION *conf, DHCPCDUIPlugin *dhcp)
 {
-    const char *val, *val6;
-    bool autocnf = true;
+    const char *val;
+    bool autocnf;
 
     if ((val = dhcpcd_config_get_static(conf, "ip_address=")) != NULL)
         autocnf = false;
-    if ((val6 = dhcpcd_config_get_static(conf, "ip6_address=")) != NULL)
-        autocnf = false;
-    if (autocnf == true) {
-        val = dhcpcd_config_get(conf, "inform");
-        val6 = dhcpcd_config_get(conf, "inform6");
-        if (val == NULL && val6 == NULL &&
+    else {
+        if ((val = dhcpcd_config_get(conf, "inform")) == NULL &&
             (dhcp->iface && dhcp->iface->ifflags & IFF_POINTOPOINT))
             autocnf = false;
+        else
+            autocnf = true;
     }
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dhcp->autoconf), autocnf);
     gtk_entry_set_text(GTK_ENTRY(dhcp->address), val ? val : "");
-    gtk_entry_set_text(GTK_ENTRY(dhcp->address6), val6 ? val6 : "");
     val = dhcpcd_config_get_static(conf, "routers=");
     gtk_entry_set_text(GTK_ENTRY(dhcp->router), val ? val : "");
     val = dhcpcd_config_get_static(conf, "domain_name_servers=");
     gtk_entry_set_text(GTK_ENTRY(dhcp->dns_servers), val ? val : "");
     val = dhcpcd_config_get_static(conf, "domain_search=");
     gtk_entry_set_text(GTK_ENTRY(dhcp->dns_search), val ? val : "");
+    val = dhcpcd_config_get_static(conf, "ip6_address=");
+    gtk_entry_set_text(GTK_ENTRY(dhcp->address6), val ? val : "");
     val = dhcpcd_config_get(conf, "noipv6rs");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dhcp->noipv6rs), val != NULL);
 }
@@ -133,8 +132,6 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
     bool a, ret;
 
     ret = true;
-    a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->noipv6rs));
-    set_option(conf, false, "noipv6rs", a ? ns : NULL, &ret);
     a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->autoconf));
     if (dhcp->iface && dhcp->iface->ifflags & IFF_POINTOPOINT)
         set_option(conf, true, "ip_address=", a ? NULL : ns, &ret);
@@ -144,11 +141,9 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
             val = NULL;
         set_option(conf, false, "inform", a ? val : NULL, &ret);
         set_option(conf, true, "ip_address=", a ? NULL : val, &ret);
-        val = gtk_entry_get_text(GTK_ENTRY(dhcp->address6));
-        if (*val == '\0')
-            val = NULL;
-        set_option(conf, false, "inform6", a ? val : NULL, &ret);
-        set_option(conf, true, "ip6_address=", a ? NULL : val, &ret);
+        // the line below corrects the case where autoconf is disabled but no IP address
+        // is set, which leads to spurious blank static router & DNS lines
+        if (a == false && val == NULL) a = true;
     }
 
     val = gtk_entry_get_text(GTK_ENTRY(dhcp->router));
@@ -166,6 +161,13 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
         val = NULL;
     set_option(conf, true, "domain_search=", val, &ret);
 
+    val = gtk_entry_get_text(GTK_ENTRY(dhcp->address6));
+    if (*val == '\0')
+        val = NULL;
+    set_option(conf, true, "ip6_address=", val, &ret);
+
+    a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->noipv6rs));
+    set_option(conf, false, "noipv6rs", a ? ns : NULL, &ret);
     return ret;
 }
 
@@ -345,8 +347,6 @@ names_on_change(_unused GtkWidget *widget, gpointer data)
             }
     }
     gtk_widget_set_sensitive(dhcp->address,
-        !dhcp->iface || (dhcp->iface->ifflags & IFF_POINTOPOINT) == 0);
-    gtk_widget_set_sensitive(dhcp->address6,
         !dhcp->iface || (dhcp->iface->ifflags & IFF_POINTOPOINT) == 0);
     if (dhcp->block && dhcp->name) {
         errno = 0;
