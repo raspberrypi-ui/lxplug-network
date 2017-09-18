@@ -724,10 +724,13 @@ bgscan(gpointer data)
 static gboolean dhcpcdui_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
 {
     DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (widget);
-
     /* Show or hide the popup menu on left-click */
     if (event->button == 1)
     {
+
+#ifdef ENABLE_NLS
+    textdomain ( GETTEXT_PACKAGE );
+#endif
         menu_show (dhcp);
         return TRUE;
     }
@@ -738,6 +741,9 @@ static GtkWidget *dhcpcdui_configure (LXPanel *panel, GtkWidget *p)
 {
     DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (p);
 
+#ifdef ENABLE_NLS
+    textdomain ( GETTEXT_PACKAGE );
+#endif
     return prefs_show (dhcp);
 }
 
@@ -853,5 +859,6 @@ LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .new_instance = dhcpcdui_constructor,
     .config = dhcpcdui_configure,
     .reconfigure = dhcpcdui_configuration_changed,
-    .button_press_event = dhcpcdui_button_press_event
+    .button_press_event = dhcpcdui_button_press_event,
+    .gettext_package = GETTEXT_PACKAGE
 };
