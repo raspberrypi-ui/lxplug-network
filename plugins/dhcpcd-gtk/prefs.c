@@ -32,12 +32,15 @@
 
 #include "dhcpcd-gtk.h"
 
-//static GtkWidget *dialog, *blocks, *names, *controls, *clear, *rebind;
-//static GtkWidget *autoconf, *address, *router, *dns_servers, *dns_search;
-//static DHCPCD_OPTION *config;
-//static char *block, *name;
-//static DHCPCD_IF *iface;
-//static char **ifaces;
+
+#if 0
+static GtkWidget *dialog, *blocks, *names, *controls, *clear, *rebind;
+static GtkWidget *autoconf, *address, *router, *dns_servers, *dns_search;
+static DHCPCD_OPTION *config;
+static char *block, *name;
+static DHCPCD_IF *iface;
+static char **ifaces;
+#endif
 
 static void
 config_err_dialog(DHCPCD_CONNECTION *con, bool writing, const char *txt)
@@ -80,8 +83,8 @@ show_config(DHCPCD_OPTION *conf, DHCPCDUIPlugin *dhcp)
     gtk_entry_set_text(GTK_ENTRY(dhcp->dns_search), val ? val : "");
     val = dhcpcd_config_get_static(conf, "ip6_address=");
     gtk_entry_set_text(GTK_ENTRY(dhcp->address6), val ? val : "");
-    val = dhcpcd_config_get(conf, "noipv6rs");
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dhcp->noipv6rs), val != NULL);
+    val = dhcpcd_config_get(conf, "noipv6");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(dhcp->noipv6), val != NULL);
 }
 
 static char *
@@ -166,8 +169,8 @@ make_config(DHCPCD_OPTION **conf, DHCPCDUIPlugin *dhcp)
         val = NULL;
     set_option(conf, true, "ip6_address=", val, &ret);
 
-    a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->noipv6rs));
-    set_option(conf, false, "noipv6rs", a ? ns : NULL, &ret);
+    a = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(dhcp->noipv6));
+    set_option(conf, false, "noipv6", a ? ns : NULL, &ret);
     return ret;
 }
 
@@ -364,6 +367,15 @@ names_on_change(_unused GtkWidget *widget, gpointer data)
     gtk_widget_set_sensitive(dhcp->controls, dhcp->name ? true : false);
     gtk_widget_set_sensitive(dhcp->clear, dhcp->name ? true : false);
     gtk_widget_set_sensitive(dhcp->rebind, dhcp->name ? true : false);
+}
+
+static void
+ipv6_toggle(GtkWidget *widget, gpointer data)
+{
+    DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) data;
+    gboolean status = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget));
+    gtk_widget_set_sensitive (dhcp->address6, !status);
+    if (status) gtk_entry_set_text (GTK_ENTRY (dhcp->address6), "");
 }
 
 static int
@@ -619,9 +631,10 @@ prefs_show(DHCPCDUIPlugin *dhcp)
     dhcp->autoconf = gtk_check_button_new_with_label(
         _("Automatically configure empty options"));
     gtk_box_pack_start(GTK_BOX(vbox), dhcp->autoconf, false, false, 3);
-    dhcp->noipv6rs = gtk_check_button_new_with_label(
-        _("Disable IPv6 auto-configuration"));
-    gtk_box_pack_start(GTK_BOX(vbox), dhcp->noipv6rs, false, false, 3);
+    dhcp->noipv6 = gtk_check_button_new_with_label(
+        _("Disable IPv6"));
+    g_signal_connect(G_OBJECT(dhcp->noipv6), "toggled", G_CALLBACK(ipv6_toggle), dhcp);
+    gtk_box_pack_start(GTK_BOX(vbox), dhcp->noipv6, false, false, 3);
     table = gtk_table_new(6, 2, false);
     gtk_box_pack_start(GTK_BOX(dhcp->controls), table, false, false, 0);
 

@@ -1,3 +1,9 @@
+lxplug-network (0.4) stretch; urgency=medium
+
+  * Change noipv6rs option to noipv6 option
+
+ -- Simon Long <simon@raspberrypi.org>  Mon, 18 Sep 2017 10:27:46 +0100
+
 lxplug-network (0.3) stretch; urgency=medium
 
   * Modify preferences dialog for compatibility with IPv6

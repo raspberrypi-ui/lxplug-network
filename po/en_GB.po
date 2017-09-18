@@ -1,15 +1,15 @@
-# English translations for PACKAGE package.
-# Copyright (C) 2017 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-#  <simon@raspberrypi.org>, 2017.
+# English translations for lxplug_dhcpcdui package.
+# Copyright (C) 2017 Raspberry Pi Ltd.
+# This file is distributed under the same license as the lxplug_dhcpcdui package.
+# Simon Long <simon@raspberrypi.org>, 2017.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: lxplug_dhcpcdui 0.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-06 17:12+0000\n"
-"PO-Revision-Date: 2017-03-06 17:15+0000\n"
-"Last-Translator:  <simon@raspberrypi.org>\n"
+"POT-Creation-Date: 2017-09-18 13:48+0000\n"
+"PO-Revision-Date: 2017-09-18 13:48+0000\n"
+"Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
@@ -17,80 +17,80 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../plugins/dhcpcd-gtk/main.c:366
+#: ../plugins/dhcpcd-gtk/main.c:368
 msgid "Error creating new GIO Channel\n"
 msgstr "Error creating new GIO Channel\n"
 
-#: ../plugins/dhcpcd-gtk/main.c:371
+#: ../plugins/dhcpcd-gtk/main.c:373
 msgid "Error creating watch\n"
 msgstr "Error creating watch\n"
 
-#: ../plugins/dhcpcd-gtk/main.c:378
+#: ../plugins/dhcpcd-gtk/main.c:380
 msgid "g_try_malloc\n"
 msgstr "g_try_malloc\n"
 
-#: ../plugins/dhcpcd-gtk/main.c:404
+#: ../plugins/dhcpcd-gtk/main.c:406
 #, c-format
 msgid "Status changed to %s"
 msgstr "Status changed to %s"
 
-#: ../plugins/dhcpcd-gtk/main.c:407
+#: ../plugins/dhcpcd-gtk/main.c:409
 msgid "Connection to dhcpcd lost"
 msgstr "Connection to dhcpcd lost"
 
-#: ../plugins/dhcpcd-gtk/main.c:407
+#: ../plugins/dhcpcd-gtk/main.c:409
 msgid "dhcpcd not running"
 msgstr "dhcpcd not running"
 
-#: ../plugins/dhcpcd-gtk/main.c:429
+#: ../plugins/dhcpcd-gtk/main.c:431
 #, c-format
 msgid "Connected to %s-%s"
 msgstr "Connected to %s-%s"
 
-#: ../plugins/dhcpcd-gtk/main.c:447
+#: ../plugins/dhcpcd-gtk/main.c:449
 msgid "dhcpcd connection lost"
 msgstr "dhcpcd connection lost"
 
-#: ../plugins/dhcpcd-gtk/main.c:517
+#: ../plugins/dhcpcd-gtk/main.c:519
 msgid "Network event"
 msgstr "Network event"
 
-#: ../plugins/dhcpcd-gtk/main.c:559
+#: ../plugins/dhcpcd-gtk/main.c:561
 #, c-format
 msgid "dhcpcd WPA connection lost: %s"
 msgstr "dhcpcd WPA connection lost: %s"
 
-#: ../plugins/dhcpcd-gtk/main.c:621
+#: ../plugins/dhcpcd-gtk/main.c:623
 #, c-format
 msgid "%s: Received scan results"
 msgstr "%s: Received scan results"
 
-#: ../plugins/dhcpcd-gtk/main.c:643
+#: ../plugins/dhcpcd-gtk/main.c:645
 msgid "New Access Point"
 msgstr "New Access Point"
 
-#: ../plugins/dhcpcd-gtk/main.c:652
+#: ../plugins/dhcpcd-gtk/main.c:654
 msgid "New Access Points"
 msgstr "New Access Points"
 
-#: ../plugins/dhcpcd-gtk/main.c:688
+#: ../plugins/dhcpcd-gtk/main.c:690
 #, c-format
 msgid "%s: WPA status %s"
 msgstr "%s: WPA status %s"
 
-#: ../plugins/dhcpcd-gtk/main.c:800
+#: ../plugins/dhcpcd-gtk/main.c:810
 msgid "Connecting to dhcpcd ..."
 msgstr "Connecting to dhcpcd ..."
 
-#: ../plugins/dhcpcd-gtk/main.c:806
+#: ../plugins/dhcpcd-gtk/main.c:816
 msgid "Connecting ..."
 msgstr "Connecting ..."
 
-#: ../plugins/dhcpcd-gtk/main.c:847
+#: ../plugins/dhcpcd-gtk/main.c:857
 msgid "Wireless & Wired Network"
 msgstr "Wireless & Wired Network"
 
-#: ../plugins/dhcpcd-gtk/main.c:848
+#: ../plugins/dhcpcd-gtk/main.c:858
 msgid "Control for dhcpcd network interface"
 msgstr "Control for dhcpcd network interface"
 
@@ -131,51 +131,59 @@ msgstr "_About"
 msgid "_Quit"
 msgstr "_Quit"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:48
+#: ../plugins/dhcpcd-gtk/prefs.c:51
 msgid "Error saving"
 msgstr "Error saving"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:48
+#: ../plugins/dhcpcd-gtk/prefs.c:51
 msgid "Error reading"
 msgstr "Error reading"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:52
+#: ../plugins/dhcpcd-gtk/prefs.c:55
 msgid "Config error"
 msgstr "Config error"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:532
+#: ../plugins/dhcpcd-gtk/prefs.c:574
 msgid "Network Preferences"
 msgstr "Network Preferences"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:544
+#: ../plugins/dhcpcd-gtk/prefs.c:586
 msgid "Configure:"
 msgstr "Configure:"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:590
+#: ../plugins/dhcpcd-gtk/prefs.c:632
 msgid "Automatically configure empty options"
 msgstr "Automatically configure empty options"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:605
-msgid "IP Address:"
-msgstr "IP Address:"
+#: ../plugins/dhcpcd-gtk/prefs.c:635
+msgid "Disable IPv6"
+msgstr "Disable IPv6"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:613
+#: ../plugins/dhcpcd-gtk/prefs.c:651
+msgid "IPv4 Address:"
+msgstr "IPv4 Address:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:659
+msgid "IPv6 Address:"
+msgstr "IPv6 Address:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:667
 msgid "Router:"
 msgstr "Router:"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:621
+#: ../plugins/dhcpcd-gtk/prefs.c:675
 msgid "DNS Servers:"
 msgstr "DNS Servers:"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:628
+#: ../plugins/dhcpcd-gtk/prefs.c:682
 msgid "DNS Search:"
 msgstr "DNS Search:"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:634
+#: ../plugins/dhcpcd-gtk/prefs.c:688
 msgid "C_lear"
 msgstr "C_lear"
 
-#: ../plugins/dhcpcd-gtk/prefs.c:649
+#: ../plugins/dhcpcd-gtk/prefs.c:703
 msgid "The dhcpcd configuration file is not writeable"
 msgstr "The dhcpcd configuration file is not writeable"
 
