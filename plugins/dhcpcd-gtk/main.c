@@ -403,6 +403,11 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con,
     bool refresh;
     WI_SCAN *w;
 
+#ifdef ENABLE_NLS
+    // need to rebind here for tooltip update
+    textdomain ( GETTEXT_PACKAGE );
+#endif
+
     g_message(_("Status changed to %s"), status_msg);
     if (status == DHC_DOWN) {
         msg = N_(last == DHC_UNKNOWN ?

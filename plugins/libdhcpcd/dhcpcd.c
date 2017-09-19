@@ -1216,6 +1216,11 @@ dhcpcd_if_message(DHCPCD_IF *i, bool *new_msg)
 	size_t len;
 	bool showssid;
 
+#ifdef ENABLE_NLS
+    // need to rebind here for tooltip update
+    textdomain ( GETTEXT_PACKAGE );
+#endif
+
 	assert(i);
 	/* Don't report non SLAAC configurations */
 	if (i->type == DHT_RA && i->up &&
