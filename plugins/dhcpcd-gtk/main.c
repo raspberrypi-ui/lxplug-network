@@ -724,13 +724,13 @@ bgscan(gpointer data)
 static gboolean dhcpcdui_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
 {
     DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (widget);
-    /* Show or hide the popup menu on left-click */
-    if (event->button == 1)
-    {
 
 #ifdef ENABLE_NLS
     textdomain ( GETTEXT_PACKAGE );
 #endif
+    /* Show or hide the popup menu on left-click */
+    if (event->button == 1)
+    {
         menu_show (dhcp);
         return TRUE;
     }

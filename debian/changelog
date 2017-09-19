@@ -1,3 +1,9 @@
+lxplug-network (0.5) stretch; urgency=medium
+
+  * Fix internationalisation
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 19 Sep 2017 08:24:22 +0000
+
 lxplug-network (0.4) stretch; urgency=medium
 
   * Change noipv6rs option to noipv6 option
