@@ -54,7 +54,7 @@ extern "C" {
 #define DHCPCD_TMP_DIR_PERM	0700
 #endif
 
-#define DHCPCD_RETRYOPEN	100	/* milliseconds */
+#define DHCPCD_RETRYOPEN	1000	/* milliseconds */
 #define DHCPCD_WPA_PING		500	/* milliseconds */
 #define DHCPCD_WPA_SCAN_LONG	60000	/* milliseconds */
 #define DHCPCD_WPA_SCAN_SHORT	5000	/* milliseconds */
