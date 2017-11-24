@@ -24,6 +24,7 @@
  * SUCH DAMAGE.
  */
 
+#include <stdlib.h>
 #include "config.h"
 #include "dhcpcd-gtk.h"
 
@@ -501,15 +502,7 @@ menu_show (DHCPCDUIPlugin *data)
 
     int wifi_state = wifi_enabled ();
 
-    if (wifi_state == -1)
-    {
-        // rfkill is installed, but no hardware found
-        data->menu = gtk_menu_new ();
-        item = gtk_menu_item_new_with_label (_("No wireless interfaces found"));
-        gtk_widget_set_sensitive (item, FALSE);
-        gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
-    }
-    else if (wifi_state == 0)
+    if (wifi_state == 0)
     {
         // rfkill installed, h/w found, disabled
         data->menu = gtk_menu_new ();
@@ -547,16 +540,25 @@ menu_show (DHCPCDUIPlugin *data)
         w->ifmenu = data->menu = add_scans(w, data->plugin);
     }
 
-            if (wifi_state == 1)
-            {
-                // rfkill installed, h/w found, enabled
-                item = gtk_separator_menu_item_new ();
-                gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-                item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
-                g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
-                gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-            }
-        }
+    if (wifi_state == 1)
+    {
+        // rfkill installed, h/w found, enabled
+        item = gtk_separator_menu_item_new ();
+        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+        item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
+        g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
+        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+    }
+    if (wifi_state == -1)
+    {
+        // rfkill is installed, but can't control the hardware
+        item = gtk_separator_menu_item_new ();
+        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+        item = gtk_menu_item_new_with_label (_("This Wi-Fi device cannot be turned off"));
+        gtk_widget_set_sensitive (item, FALSE);
+        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+    }
+    }
     }
 
     if (data->menu) {

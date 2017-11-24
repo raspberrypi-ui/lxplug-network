@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lxplug_dhcpcdui 0.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-18 13:48+0000\n"
-"PO-Revision-Date: 2017-09-18 13:48+0000\n"
+"POT-Creation-Date: 2017-11-24 11:28+0000\n"
+"PO-Revision-Date: 2017-11-24 11:29+0000\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
 "Language: en_GB\n"
@@ -29,105 +29,109 @@ msgstr "Error creating watch\n"
 msgid "g_try_malloc\n"
 msgstr "g_try_malloc\n"
 
-#: ../plugins/dhcpcd-gtk/main.c:406
+#: ../plugins/dhcpcd-gtk/main.c:411
 #, c-format
 msgid "Status changed to %s"
 msgstr "Status changed to %s"
 
-#: ../plugins/dhcpcd-gtk/main.c:409
+#: ../plugins/dhcpcd-gtk/main.c:414
 msgid "Connection to dhcpcd lost"
 msgstr "Connection to dhcpcd lost"
 
-#: ../plugins/dhcpcd-gtk/main.c:409
+#: ../plugins/dhcpcd-gtk/main.c:414
 msgid "dhcpcd not running"
 msgstr "dhcpcd not running"
 
-#: ../plugins/dhcpcd-gtk/main.c:431
+#: ../plugins/dhcpcd-gtk/main.c:436
 #, c-format
 msgid "Connected to %s-%s"
 msgstr "Connected to %s-%s"
 
-#: ../plugins/dhcpcd-gtk/main.c:449
+#: ../plugins/dhcpcd-gtk/main.c:454
 msgid "dhcpcd connection lost"
 msgstr "dhcpcd connection lost"
 
-#: ../plugins/dhcpcd-gtk/main.c:519
+#: ../plugins/dhcpcd-gtk/main.c:524
 msgid "Network event"
 msgstr "Network event"
 
-#: ../plugins/dhcpcd-gtk/main.c:561
+#: ../plugins/dhcpcd-gtk/main.c:566
 #, c-format
 msgid "dhcpcd WPA connection lost: %s"
 msgstr "dhcpcd WPA connection lost: %s"
 
-#: ../plugins/dhcpcd-gtk/main.c:623
+#: ../plugins/dhcpcd-gtk/main.c:628
 #, c-format
 msgid "%s: Received scan results"
 msgstr "%s: Received scan results"
 
-#: ../plugins/dhcpcd-gtk/main.c:645
+#: ../plugins/dhcpcd-gtk/main.c:650
 msgid "New Access Point"
 msgstr "New Access Point"
 
-#: ../plugins/dhcpcd-gtk/main.c:654
+#: ../plugins/dhcpcd-gtk/main.c:659
 msgid "New Access Points"
 msgstr "New Access Points"
 
-#: ../plugins/dhcpcd-gtk/main.c:690
+#: ../plugins/dhcpcd-gtk/main.c:695
 #, c-format
 msgid "%s: WPA status %s"
 msgstr "%s: WPA status %s"
 
-#: ../plugins/dhcpcd-gtk/main.c:810
+#: ../plugins/dhcpcd-gtk/main.c:815
 msgid "Connecting to dhcpcd ..."
 msgstr "Connecting to dhcpcd ..."
 
-#: ../plugins/dhcpcd-gtk/main.c:816
+#: ../plugins/dhcpcd-gtk/main.c:821
 msgid "Connecting ..."
 msgstr "Connecting ..."
 
-#: ../plugins/dhcpcd-gtk/main.c:857
+#: ../plugins/dhcpcd-gtk/main.c:862
 msgid "Wireless & Wired Network"
 msgstr "Wireless & Wired Network"
 
-#: ../plugins/dhcpcd-gtk/main.c:858
+#: ../plugins/dhcpcd-gtk/main.c:863
 msgid "Control for dhcpcd network interface"
 msgstr "Control for dhcpcd network interface"
 
-#: ../plugins/dhcpcd-gtk/menu.c:75
+#: ../plugins/dhcpcd-gtk/menu.c:76
 #, c-format
 msgid "Do you want to disconnect from the Wi-Fi network '%s'?"
 msgstr "Do you want to disconnect from the Wi-Fi network '%s'?"
 
-#: ../plugins/dhcpcd-gtk/menu.c:76
+#: ../plugins/dhcpcd-gtk/menu.c:77
 msgid "Disconnect Wi-Fi Network"
 msgstr "Disconnect Wi-Fi Network"
 
-#: ../plugins/dhcpcd-gtk/menu.c:363
+#: ../plugins/dhcpcd-gtk/menu.c:364
 msgid "No APs found - scanning..."
 msgstr "No APs found - scanning..."
 
-#: ../plugins/dhcpcd-gtk/menu.c:508 ../plugins/dhcpcd-gtk/menu.c:525
-msgid "No wireless interfaces found"
-msgstr "No wireless interfaces found"
-
-#: ../plugins/dhcpcd-gtk/menu.c:516
+#: ../plugins/dhcpcd-gtk/menu.c:509
 msgid "Turn On Wi-Fi"
 msgstr "Turn On Wi-Fi"
 
-#: ../plugins/dhcpcd-gtk/menu.c:555
+#: ../plugins/dhcpcd-gtk/menu.c:518
+msgid "No wireless interfaces found"
+msgstr "No wireless interfaces found"
+
+#: ../plugins/dhcpcd-gtk/menu.c:548
 msgid "Turn Off Wi-Fi"
 msgstr "Turn Off Wi-Fi"
 
-#: ../plugins/dhcpcd-gtk/menu.c:633
+#: ../plugins/dhcpcd-gtk/menu.c:557
+msgid "This Wi-Fi device cannot be turned off"
+msgstr "This Wi-Fi device cannot be turned off"
+
+#: ../plugins/dhcpcd-gtk/menu.c:635
 msgid "_Preferences"
 msgstr "_Preferences"
 
-#: ../plugins/dhcpcd-gtk/menu.c:647
+#: ../plugins/dhcpcd-gtk/menu.c:649
 msgid "_About"
 msgstr "_About"
 
-#: ../plugins/dhcpcd-gtk/menu.c:655
+#: ../plugins/dhcpcd-gtk/menu.c:657
 msgid "_Quit"
 msgstr "_Quit"
 
