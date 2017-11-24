@@ -1,3 +1,9 @@
+lxplug-network (0.6) stretch; urgency=medium
+
+  * Allow devices which are not recognised by rfkill to be controlled
+
+ -- Simon Long <simon@raspberrypi.org>  Fri, 24 Nov 2017 11:32:53 +0000
+
 lxplug-network (0.5) stretch; urgency=medium
 
   * Fix internationalisation
