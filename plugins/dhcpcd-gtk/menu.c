@@ -176,7 +176,10 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
     if (m->associated) set_icon (dhcp->panel, sel, "dialog-ok-apply", 16);
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
 
-    gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
+    char buf[256];
+    sprintf (buf, "%s%s", scan->ssid, scan->frequency > 5000 ? " (5G)" : "");
+
+    gtk_label_set_text (GTK_LABEL(m->ssid), buf);
 
     //m->icon = gtk_image_new ();
     //if (scan->flags & WSF_SECURE) set_icon (dhcp->panel, m->icon, "network-wireless-encrypted", 16);
@@ -489,6 +492,21 @@ static void toggle_wifi (_unused GObject *o, _unused gpointer data)
         system ("/usr/sbin/rfkill unblock wifi");
 }
 
+static int wifi_country_set (void)
+{
+    FILE *fp;
+
+    // is this 5G-compatible hardware?
+    fp = popen ("grep -q '^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]0[dD][0-9a-fA-F]$' /proc/cpuinfo", "r");
+    if (pclose (fp)) return 1;
+
+    // is the country set?
+    fp = popen ("iw reg get | grep -q 'country [A-Z][A-Z]:'", "r");
+    if (pclose (fp)) return 0;
+
+    return 1;
+}
+
 void
 menu_show (DHCPCDUIPlugin *data)
 {
@@ -501,14 +519,27 @@ menu_show (DHCPCDUIPlugin *data)
     menu_abort(data);
 
     int wifi_state = wifi_enabled ();
+    int wcountry = wifi_country_set ();
 
-    if (wifi_state == 0)
+    if (wifi_state == 0 || wcountry == 0)
     {
         // rfkill installed, h/w found, disabled
         data->menu = gtk_menu_new ();
-        item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
-        g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
-        gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+        if (wcountry == 0)
+        {
+            item = gtk_menu_item_new_with_label (_("Set Wi-Fi Country on Localisation tab of"));
+            gtk_widget_set_sensitive (item, FALSE);
+            gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+            item = gtk_menu_item_new_with_label (_("Raspberry Pi Configuration to enable Wi-Fi"));
+            gtk_widget_set_sensitive (item, FALSE);
+            gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+        }
+        else
+        {
+            item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
+            g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
+            gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+        }
     }
     else
     {
