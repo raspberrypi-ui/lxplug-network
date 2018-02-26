@@ -1,3 +1,9 @@
+lxplug-network (0.7) stretch; urgency=medium
+
+  * Warn if 5G device is used with no country set
+
+ -- Simon Long <simon@raspberrypi.org>  Mon, 26 Feb 2018 11:10:40 +0000
+
 lxplug-network (0.6) stretch; urgency=medium
 
   * Allow devices which are not recognised by rfkill to be controlled

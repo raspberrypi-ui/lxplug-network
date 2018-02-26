@@ -447,9 +447,6 @@ dhcpcd_wi_scan_compare(DHCPCD_WI_SCAN *a, DHCPCD_WI_SCAN *b)
 	if (cmp == 0)
 		cmp = strcmp(a->ssid, b->ssid);
 
-    if (cmp == 0)
-        cmp = (a->frequency / 1000) - (b->frequency / 1000);
-
 	/* If still the same, return strongest first */
 	if (cmp == 0)
 		cmp = b->strength.value - a->strength.value;
@@ -586,7 +583,7 @@ dhcpcd_wi_scans(DHCPCD_IF *i)
 			continue;
 		}
 		/* Strip duplicated SSIDs, only show the strongest */
-		if (p && strcmp(p->ssid, w->ssid) == 0 && (p->frequency / 1000 == w->frequency / 1000)) {
+		if (p && strcmp(p->ssid, w->ssid) == 0) {
 			p->next = n;
 			free(w);
 			continue;
