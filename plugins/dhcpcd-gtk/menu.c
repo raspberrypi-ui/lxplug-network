@@ -213,6 +213,9 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     GtkWidget *box;
     const char *icon;
     bool active;
+    int msize = 16;
+    
+    if (panel_get_icon_size (dhcp->panel) > 36) msize = 24;
 
     wim = g_malloc(sizeof(*wim));
     wim->scan = scan;
@@ -227,11 +230,11 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
 
     wim->icon = gtk_image_new ();
     active = get_security_icon (scan->flags, &icon);
-    set_icon (dhcp->panel, wim->icon, icon, 16);
+    set_icon (dhcp->panel, wim->icon, icon, msize);
     gtk_box_pack_start(GTK_BOX(box), wim->icon, FALSE, FALSE, 0);
 
     wim->strength = gtk_image_new ();
-    set_icon (dhcp->panel, wim->strength, get_strength_icon_name (scan->strength.value), 16);
+    set_icon (dhcp->panel, wim->strength, get_strength_icon_name (scan->strength.value), msize);
     gtk_box_pack_start(GTK_BOX(box), wim->strength, FALSE, FALSE, 0);
 
 #if 0
