@@ -56,6 +56,7 @@ typedef struct wi_menu {
     GtkWidget *ssid;
     GtkWidget *icon;
     GtkWidget *strength;
+    GtkWidget *freq;
 } WI_MENU;
 typedef TAILQ_HEAD(wi_menu_head, wi_menu) WI_MENUS;
 

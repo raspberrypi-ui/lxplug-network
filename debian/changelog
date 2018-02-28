@@ -1,3 +1,9 @@
+lxplug-network (0.8) stretch; urgency=medium
+
+  * Indicate 5G devices in wi-fi menu
+
+ -- Simon Long <simon@raspberrypi.org>  Wed, 28 Feb 2018 14:22:55 +0000
+
 lxplug-network (0.7) stretch; urgency=medium
 
   * Warn if 5G device is used with no country set
