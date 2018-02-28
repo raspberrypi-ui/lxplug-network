@@ -555,6 +555,18 @@ dhcpcd_wi_scans_sort(DHCPCD_WI_SCAN *list)
 	}
 }
 
+static unsigned int
+dhcpcd_wi_freqflags(DHCPCD_WI_SCAN *w)
+{
+
+	if (WPA_FREQ_IS_2G(w->frequency))
+		return WSF_2G;
+	if (WPA_FREQ_IS_5G(w->frequency))
+		return WSF_5G;
+	/* Unknown frequency */
+	return 0;
+}
+
 DHCPCD_WI_SCAN *
 dhcpcd_wi_scans(DHCPCD_IF *i)
 {
@@ -584,12 +596,17 @@ dhcpcd_wi_scans(DHCPCD_IF *i)
 		}
 		/* Strip duplicated SSIDs, only show the strongest */
 		if (p && strcmp(p->ssid, w->ssid) == 0) {
+			/* Set frequency flag from the duplicate */
+			p->flags |= dhcpcd_wi_freqflags(w);
 			p->next = n;
 			free(w);
 			continue;
 		}
-		/* Remember this as the previos next time */
+		/* Remember this as the previous next time */
 		p = w;
+
+		/* Set frequency flags */
+		p->flags |= dhcpcd_wi_freqflags(w);
 
 		nh = 1;
 		hl = NULL;
@@ -944,6 +961,26 @@ dhcpcd_wpa_if(DHCPCD_WPA *wpa)
 	return dhcpcd_get_if(wpa->con, wpa->ifname, DHT_LINK);
 }
 
+static void
+dhcpcd_wpa_if_freq(DHCPCD_WPA *wpa)
+{
+	DHCPCD_IF *i;
+
+	i = dhcpcd_wpa_if(wpa);
+	if (i != NULL)
+		i->freq = dhcpcd_wpa_freq(wpa);
+}
+
+static void
+dhcpcd_wpa_if_freq_zero(DHCPCD_WPA *wpa)
+{
+	DHCPCD_IF *i;
+
+	i = dhcpcd_wpa_if(wpa);
+	if (i != NULL)
+		i->freq = 0;
+}
+
 int
 dhcpcd_wpa_open(DHCPCD_WPA *wpa)
 {
@@ -975,6 +1012,8 @@ dhcpcd_wpa_open(DHCPCD_WPA *wpa)
 		dhcpcd_wpa_close(wpa);
 		return -1;
 	}
+
+	dhcpcd_wpa_if_freq(wpa);
 
 	dhcpcd_wpa_update_status(wpa, DHC_CONNECTED);
 	if (wpa->con->wi_scanresults_cb)
@@ -1063,6 +1102,10 @@ dhcpcd_wpa_dispatch(DHCPCD_WPA *wpa)
 	    wpa->con->wi_scanresults_cb)
 		wpa->con->wi_scanresults_cb(wpa,
 		    wpa->con->wi_scanresults_context);
+	else if (strncmp(p, "CTRL-EVENT-CONNECTED", 20) == 0)
+		dhcpcd_wpa_if_freq(wpa);
+	else if (strncmp(p, "CTRL-EVENT-DISCONNECTED", 23) == 0)
+		dhcpcd_wpa_if_freq_zero(wpa);
 	else if (strcmp(p, "CTRL-EVENT-TERMINATING") == 0)
 		dhcpcd_wpa_close(wpa);
 }
@@ -1218,6 +1261,31 @@ dhcpcd_wpa_select(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *s)
 			retval = DHCPCD_WPA_ERR_ASSOC;
 	}
 	return retval;
+}
+
+int
+dhcpcd_wpa_freq(DHCPCD_WPA *wpa)
+{
+	char buf[256], *p, *s;
+	ssize_t bytes;
+	int freq;
+
+	bytes = wpa_cmd(wpa->command_fd, "STATUS", buf, sizeof(buf));
+	if (bytes == 0 || bytes == -1)
+		return false;
+
+	p = buf;
+	while ((s = strsep(&p, "\n"))) {
+		if (*s == '\0')
+			continue;
+		if (strncmp(s, "freq=", 5) == 0) {
+			dhcpcd_strtoi(&freq, s + 5);
+			return freq;
+		}
+	}
+
+	errno = ENOENT;
+	return 0;
 }
 
 void dhcpcd_wpa_set_context (DHCPCD_WPA *wpa, void *context)

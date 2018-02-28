@@ -145,7 +145,7 @@ is_associated(WI_SCAN *wi, DHCPCD_WI_SCAN *scan)
 }
 
 static bool
-get_security_icon(int flags, const char **icon)
+get_security_icon(unsigned int flags, const char **icon)
 {
 	bool active;
 
@@ -175,8 +175,15 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
     m->associated = is_associated(wi, scan);
     if (m->associated) set_icon (dhcp->panel, sel, "dialog-ok-apply", 16);
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
+#define SHOW_5G
+#if SHOW_5G
+    char buf[256];
+    sprintf (buf, "%s%s", scan->ssid, scan->flags & WSF_5G ? " (5G)" : "");
 
+    gtk_label_set_text (GTK_LABEL(m->ssid), buf);
+#else
     gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
+#endif
 
     //m->icon = gtk_image_new ();
     //if (scan->flags & WSF_SECURE) set_icon (dhcp->panel, m->icon, "network-wireless-encrypted", 16);
