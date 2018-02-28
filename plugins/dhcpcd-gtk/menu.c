@@ -176,7 +176,7 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
     if (m->associated) set_icon (dhcp->panel, sel, "dialog-ok-apply", 16);
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
 #define SHOW_5G
-#if SHOW_5G
+#ifdef SHOW_5G
     char buf[256];
     sprintf (buf, "%s%s", scan->ssid, scan->flags & WSF_5G ? " (5G)" : "");
 
