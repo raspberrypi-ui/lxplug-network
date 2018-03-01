@@ -35,6 +35,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <poll.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,25 +57,33 @@ static int
 wpa_open(const char *ifname, char **path)
 {
 	static int counter;
-	int fd;
+	size_t pwdbufsize;
+	char *pwdbuf;
+	struct passwd pwd, *tpwd;
+	int fd, r;
 	socklen_t len;
 	struct sockaddr_un sun;
 	char *tmpdir;
 
-	if (asprintf(&tmpdir, "%s-%s", DHCPCD_TMP_DIR, getlogin()) == -1)
-		return -1;
+	tmpdir = NULL;
+	fd = r = -1;
+	*path = NULL;
 
-	if (mkdir(tmpdir, DHCPCD_TMP_DIR_PERM) == -1 && errno != EEXIST) {
-		free(tmpdir);
-		return -1;
-	}
+	pwdbufsize = (size_t)sysconf(_SC_GETPW_R_SIZE_MAX);
+	pwdbuf = malloc(pwdbufsize);
+	if (pwdbuf == NULL)
+		goto out;
+	if (getpwuid_r(geteuid(), &pwd, pwdbuf, pwdbufsize, &tpwd) != 0)
+		goto out;
+	if (asprintf(&tmpdir, "%s-%s", DHCPCD_TMP_DIR, pwd.pw_name) == -1)
+		goto out;
+
+	if (mkdir(tmpdir, DHCPCD_TMP_DIR_PERM) == -1 && errno != EEXIST)
+		goto out;
 
 	if ((fd = socket(AF_UNIX,
 	    SOCK_DGRAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0)) == -1)
-	{
-		free(tmpdir);
-		return -1;
-	}
+		goto out;
 	memset(&sun, 0, sizeof(sun));
 	sun.sun_family = AF_UNIX;
 	snprintf(sun.sun_path, sizeof(sun.sun_path),
@@ -82,23 +91,29 @@ wpa_open(const char *ifname, char **path)
 	*path = strdup(sun.sun_path);
 	len = (socklen_t)SUN_LEN(&sun);
 	if (bind(fd, (struct sockaddr *)&sun, len) == -1)
-		goto failure;
+		goto out;
 	snprintf(sun.sun_path, sizeof(sun.sun_path),
 	    WPA_CTRL_DIR "/%s", ifname);
 	len = (socklen_t)SUN_LEN(&sun);
 	if (connect(fd, (struct sockaddr *)&sun, len) == -1)
-		goto failure;
+		goto out;
 
-	free(tmpdir);
-	return fd;
+	/* Success! */
+	r = 0;
 
-failure:
+out:
+	free(pwdbuf);
 	free(tmpdir);
-	close(fd);
-	unlink(*path);
-	free(*path);
-	*path = NULL;
-	return -1;
+	if (r == 0)
+		return fd;
+	if (fd != -1)
+		close(fd);
+	if (*path != NULL) {
+		unlink(*path);
+		free(*path);
+		*path = NULL;
+	}
+	return r;
 }
 
 static ssize_t
@@ -1098,15 +1113,19 @@ dhcpcd_wpa_dispatch(DHCPCD_WPA *wpa)
 		}
 	}
 
-	if (strcmp(p, "CTRL-EVENT-SCAN-RESULTS") == 0 &&
+#define	CE_SCAN_RESULTS		"CTRL-EVENT-SCAN-RESULTS"
+#define	CE_CONNECTED		"CTRL-EVENT-CONNECTED"
+#define	CE_DISCONNECTED		"CTRL-EVENT-DISCONNECTED"
+#define	CE_TERMINATING		"CTRL-EVENT-TERMINATING"
+	if (strncmp(p, CE_SCAN_RESULTS, strlen(CE_SCAN_RESULTS)) == 0 &&
 	    wpa->con->wi_scanresults_cb)
 		wpa->con->wi_scanresults_cb(wpa,
 		    wpa->con->wi_scanresults_context);
-	else if (strncmp(p, "CTRL-EVENT-CONNECTED", 20) == 0)
+	else if (strncmp(p, CE_CONNECTED, strlen(CE_CONNECTED)) == 0)
 		dhcpcd_wpa_if_freq(wpa);
-	else if (strncmp(p, "CTRL-EVENT-DISCONNECTED", 23) == 0)
+	else if (strncmp(p, CE_DISCONNECTED, strlen(CE_DISCONNECTED)) == 0)
 		dhcpcd_wpa_if_freq_zero(wpa);
-	else if (strcmp(p, "CTRL-EVENT-TERMINATING") == 0)
+	else if (strncmp(p, CE_TERMINATING, strlen(CE_TERMINATING)) == 0)
 		dhcpcd_wpa_close(wpa);
 }
 
@@ -1123,8 +1142,11 @@ dhcpcd_wpa_if_event(DHCPCD_IF *i)
 				dhcpcd_wpa_close(wpa);
 		} else if (dhcpcd_is_wireless(i) && i->con->wpa_started) {
 			wpa = dhcpcd_wpa_new(i->con, i->ifname);
-			if (wpa && wpa->listen_fd == -1)
-				dhcpcd_wpa_open(wpa);
+			if (wpa) {
+				if (wpa->listen_fd == -1)
+					dhcpcd_wpa_open(wpa);
+				i->freq = dhcpcd_wpa_freq(wpa);
+			}
 		}
 	}
 }
@@ -1286,6 +1308,39 @@ dhcpcd_wpa_freq(DHCPCD_WPA *wpa)
 
 	errno = ENOENT;
 	return 0;
+}
+
+int
+dhcpcd_wi_print_tooltip(char *buf, size_t buflen, DHCPCD_WI_SCAN *s,
+    unsigned int options)
+{
+	int r, printed = 0;
+
+	/* Provide a default */
+	if (options == 0)
+		options = WST_BSSID | WST_FREQ;
+
+#define	TOOLTIP(fmt, ...) do {	\
+	r = snprintf(buf, buflen, fmt, __VA_ARGS__);	\
+	if (r == -1 || (size_t)r > buflen)		\
+		return printed + r;			\
+	buf += r;					\
+	buflen -= (size_t)r;				\
+	printed += r;					\
+	} while (0 /* CONSTCOND */)
+
+	if (options & WST_BSSID)
+		TOOLTIP("%s", s->bssid);
+	if (options & WST_FLAGS && s->wpa_flags[0] != '\0')
+		TOOLTIP(" %s", s->wpa_flags);
+	if (options & WST_FREQ) {
+		if (s->flags & WSF_2G)
+			TOOLTIP(" %s", "2G");
+		if (s->flags & WSF_5G)
+			TOOLTIP(" %s", "5G");
+	}
+
+	return printed;
 }
 
 void dhcpcd_wpa_set_context (DHCPCD_WPA *wpa, void *context)

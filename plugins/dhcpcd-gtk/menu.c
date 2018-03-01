@@ -168,12 +168,15 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
     const char *icon;
     GtkWidget *sel = gtk_image_new ();
 
+    int msize = 16;
+
+    if (panel_get_icon_size (dhcp->panel) > 36) msize = 24;
     m->scan = scan;
 
     g_object_set_data(G_OBJECT(m->menu), "dhcpcd_wi_scan", scan);
 
     m->associated = is_associated(wi, scan);
-    if (m->associated) set_icon (dhcp->panel, sel, "dialog-ok-apply", 16);
+    if (m->associated) set_icon (dhcp->panel, sel, "dialog-ok-apply", msize);
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
     gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
 

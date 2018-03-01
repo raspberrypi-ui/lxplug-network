@@ -316,6 +316,7 @@ int dhcpcd_wpa_freq(DHCPCD_WPA *);
 #define WST_BSSID	0x01
 #define WST_FLAGS	0x02
 #define WST_FREQ	0x03
+int dhcpcd_wi_print_tooltip(char *, size_t, DHCPCD_WI_SCAN *, unsigned int);
 
 bool dhcpcd_wpa_ping(DHCPCD_WPA *);
 bool dhcpcd_wpa_can_background_scan(DHCPCD_WPA *);
