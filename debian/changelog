@@ -1,3 +1,9 @@
+lxplug-network (0.9) stretch; urgency=medium
+
+  * Merge in recent changes from dhcpcd-ui
+
+ -- Simon Long <simon@raspberrypi.org>  Fri, 02 Mar 2018 07:56:44 +0000
+
 lxplug-network (0.8) stretch; urgency=medium
 
   * Indicate 5G devices in wi-fi menu
