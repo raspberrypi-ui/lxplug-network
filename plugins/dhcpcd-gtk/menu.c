@@ -77,6 +77,7 @@ static void set_country (_unused GObject *o, _unused gpointer data)
 
     // populate the combobox
     GtkWidget *cb = gtk_combo_box_new_text ();
+    gtk_combo_box_append_text (GTK_COMBO_BOX (cb), _("<not set>"));
     fp = fopen ("/usr/share/zoneinfo/iso3166.tab", "rb");
     while (fgets (buffer, sizeof (buffer) - 1, fp))
     {
@@ -94,7 +95,7 @@ static void set_country (_unused GObject *o, _unused gpointer data)
     {
         // update the wpa_supplicant.conf file
         setting = gtk_combo_box_get_active_text (GTK_COMBO_BOX (cb));
-        if (setting)
+        if (setting && strcmp (setting, _("<not set>")))
         {
             strncpy (cnow, setting, 2);
             cnow[2] = 0;
