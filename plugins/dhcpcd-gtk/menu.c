@@ -52,6 +52,61 @@ on_quit(void)
 }
 #endif
 
+#define SET_WIFI_CTRY   "raspi-config nonint do_wifi_country %s"
+
+static void set_country (_unused GObject *o, _unused gpointer data)
+{
+    char buffer[128], cnow[16], *setting;
+    FILE *fp;
+    int n;
+
+    // create the window
+    GtkWidget *dlg = gtk_dialog_new_with_buttons (_("Select Wi-Fi Country"), NULL, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
+    gtk_window_set_position (GTK_WINDOW (dlg), GTK_WIN_POS_CENTER);
+    gtk_container_set_border_width (GTK_CONTAINER (dlg), 5);
+    gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), 10);
+    gtk_box_set_homogeneous (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), FALSE);
+
+    GtkWidget *box = gtk_hbox_new (FALSE, 5);
+    gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), box, FALSE, FALSE, 0);
+
+    // add a label
+    GtkWidget *lbl = gtk_label_new (_("Country:") );
+    gtk_misc_set_alignment (GTK_MISC (lbl), 0.0, 0.5);
+    gtk_box_pack_start (GTK_BOX (box), lbl, FALSE, FALSE, 0);
+
+    // populate the combobox
+    GtkWidget *cb = gtk_combo_box_new_text ();
+    fp = fopen ("/usr/share/zoneinfo/iso3166.tab", "rb");
+    while (fgets (buffer, sizeof (buffer) - 1, fp))
+    {
+        if (buffer[0] != 0x0A && buffer[0] != '#')
+        {
+            buffer[strlen(buffer) - 1] = 0;
+            gtk_combo_box_append_text (GTK_COMBO_BOX (cb), buffer);
+        }
+    }
+    gtk_combo_box_set_active (GTK_COMBO_BOX (cb), 0);
+    gtk_box_pack_start (GTK_BOX (box), cb, FALSE, FALSE, 0);
+    gtk_widget_show_all (dlg);
+
+    if (gtk_dialog_run (GTK_DIALOG (dlg)) == GTK_RESPONSE_OK)
+    {
+        // update the wpa_supplicant.conf file
+        setting = gtk_combo_box_get_active_text (GTK_COMBO_BOX (cb));
+        if (setting)
+        {
+            strncpy (cnow, setting, 2);
+            cnow[2] = 0;
+            sprintf (buffer, SET_WIFI_CTRY, cnow);
+            system (buffer);
+            g_free (setting);
+        }
+    }
+    gtk_widget_destroy (dlg);
+}
+
+
 static WI_SCAN *
 wi_scan_find(DHCPCD_WI_SCAN *scan, GtkWidget *p)
 {
@@ -533,11 +588,11 @@ menu_show (DHCPCDUIPlugin *data)
         data->menu = gtk_menu_new ();
         if (wcountry == 0)
         {
-            item = gtk_menu_item_new_with_label (_("Set Wi-Fi Country on Localisation tab of"));
-            gtk_widget_set_sensitive (item, FALSE);
+            item = gtk_menu_item_new_with_label (_("Wi-Fi country is not set"));
+            g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
             gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
-            item = gtk_menu_item_new_with_label (_("Raspberry Pi Configuration to enable Wi-Fi"));
-            gtk_widget_set_sensitive (item, FALSE);
+            item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
+            g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
             gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
         }
         else
