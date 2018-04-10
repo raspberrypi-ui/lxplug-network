@@ -63,6 +63,7 @@ static void set_country (_unused GObject *o, _unused gpointer data)
     // create the window
     GtkWidget *dlg = gtk_dialog_new_with_buttons (_("Select Wi-Fi Country"), NULL, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OK, GTK_RESPONSE_OK, NULL);
     gtk_window_set_position (GTK_WINDOW (dlg), GTK_WIN_POS_CENTER);
+    gtk_window_set_resizable (GTK_WINDOW (dlg), FALSE);
     gtk_container_set_border_width (GTK_CONTAINER (dlg), 5);
     gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), 10);
     gtk_box_set_homogeneous (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), FALSE);
@@ -590,7 +591,7 @@ menu_show (DHCPCDUIPlugin *data)
         if (wcountry == 0)
         {
             item = gtk_menu_item_new_with_label (_("Wi-Fi country is not set"));
-            g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
+            gtk_widget_set_sensitive (item, FALSE);
             gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
             item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
             g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
