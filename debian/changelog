@@ -1,6 +1,6 @@
 lxplug-network (0.10) stretch; urgency=medium
 
-  * Add dialog box to set Wi-Fi country from within plugin menu
+  * Add link to rc_gui to set Wi-Fi country from within plugin menu
   * Bug fix to hide networks with hidden SSIDs correctly
 
  -- Simon Long <simon@raspberrypi.org>  Mon, 09 Apr 2018 11:08:22 +0100

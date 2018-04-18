@@ -11,7 +11,7 @@ Homepage: http://raspberrypi.org/
 Package: lxplug-network
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, lxmenu-data,
- lxpanel, lxpanel-data, libfm-modules
+ lxpanel, lxpanel-data, libfm-modules, rc_gui (>=1.18)
 Recommends:
 Description: Network plugin for lxpanel
  Plugin for lxpanel ported from dhcpcd-ui to control connection to
