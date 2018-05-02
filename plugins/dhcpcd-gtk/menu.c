@@ -88,6 +88,7 @@ static void disconnect_prompt (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
     gtk_label_set_line_wrap (GTK_LABEL (lbl), TRUE);
     gtk_label_set_justify (GTK_LABEL (lbl), GTK_JUSTIFY_LEFT);
     gtk_misc_set_alignment (GTK_MISC (lbl), 0.0, 0.0);
+    gtk_misc_set_padding (GTK_MISC (lbl), 10, 10);
     gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), lbl , TRUE, TRUE, 0);
     gtk_widget_show_all (dlg);
 
