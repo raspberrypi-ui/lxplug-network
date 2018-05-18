@@ -126,6 +126,40 @@ bool wpa_disconnect (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
 	return true;
 }
 
+// parse the wpa_supplicant data file for an existing PSK
+static char *find_psk_for_network (char *ssid)
+{
+    FILE *fp;
+    char *line = NULL, *seek, *res, *ret = NULL;
+    int len = 0, state = 0;
+
+    seek = g_strdup_printf ("ssid=\"%s\"", ssid);
+    fp = fopen ("/etc/wpa_supplicant/wpa_supplicant.conf", "rb");
+    if (fp)
+    {
+        while (getline (&line, &len, fp) > 0)
+        {
+            // state : 1 in a network block; 2 in network block with matching ssid; 0 otherwise
+            if (strstr (line, "network={")) state = 1;
+            else if (strstr (line, "}")) state = 0;
+            else if (state)
+            {
+                if (strstr (line, seek)) state = 2;
+                else if (state == 2 && (res = strstr (line, "psk=")))
+                {
+                    strtok (res, "\"");
+                    ret = g_strdup (strtok (NULL, "\""));
+                    break;
+                }
+            }
+        }
+        g_free (line);
+        fclose (fp);
+    }
+    g_free (seek);
+    return ret;
+}
+
 bool
 wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
 {
@@ -135,6 +169,7 @@ wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
     const char *var;
     int result;
     bool retval;
+    char *epsk;
 
     /* Take a copy of scan incase it's destroyed by a scan update */
     memcpy(&s, scan, sizeof(s));
@@ -165,6 +200,11 @@ wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
     gtk_box_pack_start(GTK_BOX(hbox), label, false, false, 5);
     psk = gtk_entry_new();
     gtk_entry_set_max_length(GTK_ENTRY(psk), 130);
+    if (epsk = find_psk_for_network (s.ssid))
+    {
+        gtk_entry_set_text (GTK_ENTRY(psk), epsk);
+        g_free (epsk);
+    }
     g_signal_connect(G_OBJECT(psk), "activate",
         G_CALLBACK(onEnter), dhcp->wpa_dialog);
     gtk_box_pack_start(GTK_BOX(hbox), psk, true, true, 5);

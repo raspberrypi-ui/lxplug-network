@@ -97,7 +97,7 @@ msgstr "Control for dhcpcd network interface"
 #: ../plugins/dhcpcd-gtk/menu.c:132
 #, c-format
 msgid "Do you want to disconnect from the Wi-Fi network '%s'?"
-msgstr "Do you want to disconnect from the WiFi network '%s'?"
+msgstr "Do you want to forget the WiFi network '%s'?"
 
 #: ../plugins/dhcpcd-gtk/menu.c:133
 msgid "Disconnect Wi-Fi Network"
