@@ -1,3 +1,9 @@
+lxplug-network (0.12) stretch; urgency=medium
+
+  * Hide PSK characters by default, with check box to toggle
+
+ -- Simon Long <simon@raspberrypi.org>  Thu, 12 Jul 2018 15:07:45 +0100
+
 lxplug-network (0.11) stretch; urgency=medium
 
   * Recall stored PSK when reconnecting to a network

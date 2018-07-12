@@ -160,12 +160,18 @@ static char *find_psk_for_network (char *ssid)
     return ret;
 }
 
+static void psk_toggle (GtkButton *btn, gpointer ptr)
+{
+    gtk_entry_set_visibility (GTK_ENTRY (ptr),
+        !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (btn)));
+}
+
 bool
 wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
 {
     DHCPCD_WI_SCAN s;
     DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) dhcpcd_wpa_get_context (wpa);
-    GtkWidget *label, *psk, *vbox, *hbox;
+    GtkWidget *label, *psk, *vbox, *hbox, *check;
     const char *var;
     int result;
     bool retval;
@@ -209,6 +215,15 @@ wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
         G_CALLBACK(onEnter), dhcp->wpa_dialog);
     gtk_box_pack_start(GTK_BOX(hbox), psk, true, true, 5);
     gtk_container_add(GTK_CONTAINER(vbox), hbox);
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    check = gtk_check_button_new_with_label  (_("Hide characters"));
+    gtk_toggle_button_set_mode (GTK_TOGGLE_BUTTON (check), TRUE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (check), TRUE);
+    g_signal_connect (check, "toggled", G_CALLBACK (psk_toggle), psk);
+    gtk_box_pack_end (GTK_BOX (hbox), check, FALSE, FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (vbox), hbox);
+    gtk_entry_set_visibility (GTK_ENTRY (psk), FALSE);
+
 
     gtk_widget_show_all(dhcp->wpa_dialog);
     result = gtk_dialog_run(GTK_DIALOG(dhcp->wpa_dialog));
