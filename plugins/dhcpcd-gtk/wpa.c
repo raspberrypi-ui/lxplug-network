@@ -224,7 +224,6 @@ wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
     gtk_container_add (GTK_CONTAINER (vbox), hbox);
     gtk_entry_set_visibility (GTK_ENTRY (psk), FALSE);
 
-
     gtk_widget_show_all(dhcp->wpa_dialog);
     result = gtk_dialog_run(GTK_DIALOG(dhcp->wpa_dialog));
 
