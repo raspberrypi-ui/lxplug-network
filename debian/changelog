@@ -1,3 +1,9 @@
+lxplug-network (0.13) stretch; urgency=medium
+
+  * Prioritise check for hardware not found over country setting in menu
+
+ -- Simon Long <simon@raspberrypi.org>  Mon, 28 Jan 2019 10:54:26 +0000
+
 lxplug-network (0.12) stretch; urgency=medium
 
   * Hide PSK characters by default, with check box to toggle
