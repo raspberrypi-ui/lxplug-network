@@ -537,37 +537,38 @@ menu_show (DHCPCDUIPlugin *data)
     int wifi_state = wifi_enabled ();
     int wcountry = wifi_country_set ();
 
-    if (wifi_state == 0 || wcountry == 0)
+    if (wifi_state == 0)
     {
         // rfkill installed, h/w found, disabled
         data->menu = gtk_menu_new ();
-        if (wcountry == 0)
+        item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
+        g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
+        gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+    }
+    else
+    {
+        if ((w = TAILQ_FIRST(&data->wi_scans)) == NULL)
         {
-            item = gtk_menu_item_new_with_label (_("Wi-Fi country is not set"));
+            data->menu = gtk_menu_new ();
+            item = gtk_menu_item_new_with_label (_("No wireless interfaces found"));
             gtk_widget_set_sensitive (item, FALSE);
-            gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
-            item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
-            g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
-            gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+            gtk_menu_shell_append (GTK_MENU_SHELL(data->menu), item);
         }
         else
         {
-            item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
-            g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
-            gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
-        }
-    }
-    else
-    {
-    if ((w = TAILQ_FIRST(&data->wi_scans)) == NULL)
-    {
-        data->menu = gtk_menu_new ();
-        item = gtk_menu_item_new_with_label (_("No wireless interfaces found"));
-        gtk_widget_set_sensitive (item, FALSE);
-        gtk_menu_shell_append (GTK_MENU_SHELL(data->menu), item);
-    }
-    else
-    {
+            if (wcountry == 0)
+            {
+                data->menu = gtk_menu_new ();
+                item = gtk_menu_item_new_with_label (_("Wi-Fi country is not set"));
+                gtk_widget_set_sensitive (item, FALSE);
+                gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+                item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
+                g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
+                gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+            }
+            else
+            {
+                /* start original code block - retain indent for compares */
     if ((l = TAILQ_LAST(&data->wi_scans, wi_scan_head)) && l != w) {
         data->menu = gtk_menu_new();
         TAILQ_FOREACH(w, &data->wi_scans, next) {
@@ -586,26 +587,29 @@ menu_show (DHCPCDUIPlugin *data)
     } else {
         w->ifmenu = data->menu = add_scans(w, data->plugin);
     }
+                /* end original code block - retain indent for compares */
 
-    if (wifi_state == 1)
-    {
-        // rfkill installed, h/w found, enabled
-        item = gtk_separator_menu_item_new ();
-        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-        item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
-        g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
-        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-    }
-    if (wifi_state == -1)
-    {
-        // rfkill is installed, but can't control the hardware
-        item = gtk_separator_menu_item_new ();
-        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-        item = gtk_menu_item_new_with_label (_("This Wi-Fi device cannot be turned off"));
-        gtk_widget_set_sensitive (item, FALSE);
-        gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-    }
-    }
+                if (wifi_state == 1)
+                {
+                    // rfkill installed, h/w found, enabled
+                    item = gtk_separator_menu_item_new ();
+                    gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+                    item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
+                    g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
+                    gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+                }
+
+                if (wifi_state == -1)
+                {
+                    // rfkill is installed, but can't control the hardware
+                    item = gtk_separator_menu_item_new ();
+                    gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+                    item = gtk_menu_item_new_with_label (_("This Wi-Fi device cannot be turned off"));
+                    gtk_widget_set_sensitive (item, FALSE);
+                    gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+                }
+            }
+        }
     }
 
     if (data->menu) {
