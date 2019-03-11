@@ -147,8 +147,8 @@ static char *find_psk_for_network (char *ssid)
                 if (strstr (line, seek)) state = 2;
                 else if (state == 2 && (res = strstr (line, "psk=")))
                 {
-                    strtok (res, "\"");
-                    ret = g_strdup (strtok (NULL, "\""));
+                    if (!strchr (strtok (line, "\""), '#'))
+                        ret = g_strdup (strtok (NULL, "\""));
                     break;
                 }
             }
