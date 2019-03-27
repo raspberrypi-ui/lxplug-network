@@ -513,7 +513,7 @@ static int wifi_country_set (void)
     FILE *fp;
 
     // is this 5G-compatible hardware?
-    fp = popen ("iw phy0 info | grep -q '5... MHz'", "r");
+    fp = popen ("iw phy0 info | grep -q '\\*[ \\t]*5[0-9][0-9][0-9][ \\t]*MHz'", "r");
     if (pclose (fp)) return 1;
 
     // is the country set?
