@@ -1,3 +1,10 @@
+lxplug-network (0.14) stretch; urgency=medium
+
+  * Check for 5G hardware by querying iw info
+  * Don't read back commented-out passwords into network selection box
+
+ -- Simon Long <simon@raspberrypi.org>  Wed, 27 Mar 2019 11:49:02 +0000
+
 lxplug-network (0.13) stretch; urgency=medium
 
   * Prioritise check for hardware not found over country setting in menu
