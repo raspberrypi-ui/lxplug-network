@@ -1,0 +1,6 @@
+By default, the plugin scans for wifi networks every 60 seconds, increasing
+to every 5 seconds while the menu is open. These times can be overridden
+by setting the config parameters "BgScan" and "BgScanMenu", respectively,
+in the Config section of the "dhcpcdui" plugin in the lxpanel panel 
+definition file. Each takes a time in seconds as an argument - setting
+a value to 0 disables the relevant background scan.

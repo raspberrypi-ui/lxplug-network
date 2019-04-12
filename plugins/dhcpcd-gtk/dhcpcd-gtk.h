@@ -104,6 +104,10 @@ typedef struct {
     guint reopen_timer;
     guint wpa_reopen_timer;
 
+    /* Scan intervals */
+    int menu_scan_timer;
+    int nomenu_scan_timer;
+
     /* Menu */
     GtkWidget *menu;
 

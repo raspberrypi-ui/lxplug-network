@@ -806,6 +806,7 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     /* Allocate and initialize plugin context */
     DHCPCDUIPlugin * dhcp = g_new0 (DHCPCDUIPlugin, 1);
     GtkWidget *p;
+    int val;
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
@@ -851,8 +852,27 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     if (dhcpcd_try_open (dhcp))
         dhcp->reopen_timer = g_timeout_add (DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
 
+    if (config_setting_lookup_int (settings, "BgScan", &val))
+    {
+        dhcp->nomenu_scan_timer = val * 1000;
+    }
+    else dhcp->nomenu_scan_timer = DHCPCD_WPA_SCAN_LONG;
+
+    if (config_setting_lookup_int (settings, "BgScanMenu", &val))
+    {
+        dhcp->menu_scan_timer = val * 1000;
+    }
+    else dhcp->menu_scan_timer = DHCPCD_WPA_SCAN_SHORT;
+
     /* Start background scanning */
-    dhcp->defscan_timer = g_timeout_add (DHCPCD_WPA_SCAN_LONG, bgscan, dhcp);
+    if (dhcp->nomenu_scan_timer > 0)
+        dhcp->defscan_timer = g_timeout_add (dhcp->nomenu_scan_timer, bgscan, dhcp);
+
+    /* Null dialog pointers so they don't get closed when they don't exist...*/
+    dhcp->dialog = NULL;
+    dhcp->wpa_err = NULL;
+    dhcp->wpa_dialog = NULL;
+    dhcp->menu = NULL;
 
     /* Show the widget, and return. */
     gtk_widget_show_all (p);

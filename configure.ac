@@ -336,7 +336,6 @@ fi
 AC_DEFINE([HAS_GETTEXT], [1], [Has gettext function])
 AC_DEFINE([HAVE_STRVERSCMP], [1], [Has strversmp function])
 AC_DEFINE([strlcpy(dst, src, n)],[((size_t)snprintf(dst, n, "%s", src))],[Replacement strlcpy function])
-AC_DEFINE([BG_SCAN], [1], [Perform regular network scans])
 
 AC_CONFIG_FILES([
     Makefile

@@ -1,8 +1,5 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Perform regular network scans */
-#undef BG_SCAN
-
 /* Disable menu related routines */
 #undef DISABLE_MENU
 

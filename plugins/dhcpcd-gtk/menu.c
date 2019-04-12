@@ -618,10 +618,9 @@ menu_show (DHCPCDUIPlugin *data)
             dhcpcdui_popup_set_position, data,
             1, gtk_get_current_event_time());
 
-#ifdef BG_SCAN
-        data->bgscan_timer = g_timeout_add(DHCPCD_WPA_SCAN_SHORT,
+    if (data->menu_scan_timer > 0)
+        data->bgscan_timer = g_timeout_add (data->menu_scan_timer,
             menu_bgscan, data);
-#endif
     }
 }
 
