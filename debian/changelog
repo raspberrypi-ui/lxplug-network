@@ -1,3 +1,9 @@
+lxplug-network (0.15) stretch; urgency=medium
+
+  * Add config parameters to control background scan frequency
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 23 Apr 2019 08:22:55 +0100
+
 lxplug-network (0.14) stretch; urgency=medium
 
   * Check for 5G hardware by querying iw info
