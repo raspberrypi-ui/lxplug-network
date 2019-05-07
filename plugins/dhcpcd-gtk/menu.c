@@ -517,7 +517,7 @@ static int wifi_country_set (void)
     if (pclose (fp)) return 1;
 
     // is the country set?
-    fp = popen ("raspi-config nonint get_wifi_country", "r");
+    fp = popen ("raspi-config nonint get_wifi_country 1", "r");
     if (pclose (fp)) return 0;
 
     return 1;
