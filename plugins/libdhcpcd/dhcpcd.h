@@ -197,6 +197,8 @@ typedef struct dhcpcd_wi_hist {
 typedef struct dhcpcd_wpa {
 	struct dhcpcd_wpa *next;
 	char ifname[IF_NAMESIZE];
+	char userconnect_ssid[IF_SSIDSIZE];
+	char connect_ssid[IF_SSIDSIZE];
 	unsigned int status;
 	int command_fd;
 	char *command_path;
@@ -227,6 +229,8 @@ typedef struct dhcpcd_connection {
 	bool wpa_started;
 	void (*wi_scanresults_cb)(DHCPCD_WPA *, void *);
 	void *wi_scanresults_context;
+	void (*wi_error_cb)(DHCPCD_WPA *, void *);
+	void *wi_error_context;
 	void (*wpa_status_cb)(DHCPCD_WPA *, unsigned int, const char *, void *);
 	void *wpa_status_context;
 
@@ -300,6 +304,10 @@ DHCPCD_IF *dhcpcd_wpa_if(DHCPCD_WPA *);
 void dhcpcd_wpa_if_event(DHCPCD_IF *);
 void dhcpcd_wpa_set_scan_callback(DHCPCD_CONNECTION *,
     void (*)(DHCPCD_WPA *, void *), void *);
+ void
+dhcpcd_wpa_set_error_callback(DHCPCD_CONNECTION *con,
+    void (*cb)(DHCPCD_WPA *, void *), void *context);
+
 void dhcpcd_wpa_set_status_callback(DHCPCD_CONNECTION *,
     void (*)(DHCPCD_WPA *, unsigned int, const char *, void *), void *);
 int dhcpcd_wi_scan_compare(DHCPCD_WI_SCAN *a, DHCPCD_WI_SCAN *b);

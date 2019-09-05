@@ -29,8 +29,7 @@
 #include "dhcpcd-gtk.h"
 
 //static GtkWidget *wpa_dialog, *wpa_err;
-
-static void
+void
 wpa_show_err(const char *title, const char *txt, DHCPCDUIPlugin *dhcp)
 {
 

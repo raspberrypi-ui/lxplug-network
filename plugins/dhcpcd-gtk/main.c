@@ -49,6 +49,9 @@ static NotifyNotification *nn;
 
 static gboolean dhcpcd_try_open(gpointer data);
 static gboolean dhcpcd_wpa_try_open(gpointer data);
+extern void
+wpa_show_err(const char *title, const char *txt, DHCPCDUIPlugin *dhcp);
+
 
 void set_icon (LXPanel *p, GtkWidget *image, const char *icon, int size)
 {
@@ -687,6 +690,14 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, gpointer p)
     }
 }
 
+
+static void
+dhcpcd_wpa_error_cb(DHCPCD_WPA *wpa, gpointer p)
+{
+    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) p;
+    wpa_show_err(_("Error Connecting"),_("There was an error connecting to the wifi network. Check your selected network and key and try again."),dhcp);
+}
+
 static void
 dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa,
     unsigned int status, const char *status_msg, gpointer p)
@@ -848,6 +859,7 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     dhcpcd_set_status_callback (dhcp->con, dhcpcd_status_cb, dhcp);
     dhcpcd_set_if_callback (dhcp->con, dhcpcd_if_cb, dhcp);
     dhcpcd_wpa_set_scan_callback (dhcp->con, dhcpcd_wpa_scan_cb, dhcp);
+    dhcpcd_wpa_set_error_callback(dhcp->con, dhcpcd_wpa_error_cb, dhcp);
     dhcpcd_wpa_set_status_callback (dhcp->con, dhcpcd_wpa_status_cb, dhcp);
     if (dhcpcd_try_open (dhcp))
         dhcp->reopen_timer = g_timeout_add (DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
