@@ -1,3 +1,9 @@
+lxplug-network (0.17) buster; urgency=medium
+
+  * Fix typo in string decoding
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 17 Sep 2019 15:39:04 +0100
+
 lxplug-network (0.16) unstable; urgency=medium
 
   * Use raspi-config to check whether wifi country is set
