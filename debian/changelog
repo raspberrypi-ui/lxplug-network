@@ -1,3 +1,9 @@
+lxplug-network (0.18) buster; urgency=medium
+
+  * Additional fix in octal parser
+
+ -- Simon Long <simon@raspberrypi.org>  Thu, 19 Sep 2019 14:14:15 +0100
+
 lxplug-network (0.17) buster; urgency=medium
 
   * Fix typo in string decoding
