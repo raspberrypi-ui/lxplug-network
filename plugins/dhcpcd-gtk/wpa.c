@@ -131,7 +131,8 @@ static char *find_psk_for_network (char *ssid)
 {
     FILE *fp;
     char *line = NULL, *seek, *res, *ret = NULL;
-    int len = 0, state = 0;
+    size_t len = 0;
+    int state = 0;
 
     seek = g_strdup_printf ("ssid=\"%s\"", ssid);
     fp = fopen ("/etc/wpa_supplicant/wpa_supplicant.conf", "rb");

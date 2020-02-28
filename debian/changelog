@@ -1,3 +1,9 @@
+lxplug-network (0.19) buster; urgency=medium
+
+  * Use size_t for all getline calls
+
+ -- Simon Long <simon@raspberrypi.org>  Fri, 28 Feb 2020 07:04:41 +0000
+
 lxplug-network (0.18) buster; urgency=medium
 
   * Additional fix in octal parser
