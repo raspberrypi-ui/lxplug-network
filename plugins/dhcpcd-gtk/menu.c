@@ -178,15 +178,12 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
     const char *icon;
     GtkWidget *sel = gtk_image_new ();
 
-    int msize = 16;
-
-    if (panel_get_icon_size (dhcp->panel) > 36) msize = 24;
     m->scan = scan;
 
     g_object_set_data(G_OBJECT(m->menu), "dhcpcd_wi_scan", scan);
 
     m->associated = is_associated(wi, scan);
-    if (m->associated) set_icon (dhcp->panel, sel, "dialog-ok-apply", msize);
+    if (m->associated) lxpanel_plugin_set_menu_icon (dhcp->panel, sel, "dialog-ok-apply");
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
     gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
 
@@ -218,9 +215,6 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     GtkWidget *box;
     const char *icon;
     bool active;
-    int msize = 16;
-    
-    if (panel_get_icon_size (dhcp->panel) > 36) msize = 24;
 
     wim = g_malloc(sizeof(*wim));
     wim->scan = scan;
@@ -234,16 +228,16 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     gtk_box_pack_start(GTK_BOX(box), wim->ssid, TRUE, TRUE, 0);
 
     wim->freq = gtk_image_new ();
-    set_icon (dhcp->panel, wim->freq, scan->flags & WSF_5G ? "5g" : "", msize);
+    lxpanel_plugin_set_menu_icon (dhcp->panel, wim->freq, scan->flags & WSF_5G ? "5g" : "");
     gtk_box_pack_start(GTK_BOX(box), wim->freq, FALSE, FALSE, 0);
 
     wim->icon = gtk_image_new ();
     active = get_security_icon (scan->flags, &icon);
-    set_icon (dhcp->panel, wim->icon, icon, msize);
+    lxpanel_plugin_set_menu_icon (dhcp->panel, wim->icon, icon);
     gtk_box_pack_start(GTK_BOX(box), wim->icon, FALSE, FALSE, 0);
 
     wim->strength = gtk_image_new ();
-    set_icon (dhcp->panel, wim->strength, get_strength_icon_name (scan->strength.value), msize);
+    lxpanel_plugin_set_menu_icon (dhcp->panel, wim->strength, get_strength_icon_name (scan->strength.value));
     gtk_box_pack_start(GTK_BOX(box), wim->strength, FALSE, FALSE, 0);
 
 #if 0
@@ -576,7 +570,7 @@ menu_show (DHCPCDUIPlugin *data)
                 w->interface->ifname);
             gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (item), TRUE);
             image = gtk_image_new ();
-            set_icon (data->panel, image, "network-wireless", 16);
+            lxpanel_plugin_set_menu_icon (data->panel, image, "network-wireless");
             gtk_image_menu_item_set_image(
                 GTK_IMAGE_MENU_ITEM(item), image);
             gtk_menu_shell_append(GTK_MENU_SHELL(data->menu), item);

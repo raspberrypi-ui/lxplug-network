@@ -1,3 +1,9 @@
+lxplug-network (0.20) buster; urgency=medium
+
+  * Use generic icon load code
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 16 Apr 2020 15:49:32 +0100
+
 lxplug-network (0.19) buster; urgency=medium
 
   * Use size_t for all getline calls
