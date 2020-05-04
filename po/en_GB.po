@@ -97,11 +97,11 @@ msgstr "Control for dhcpcd network interface"
 #: ../plugins/dhcpcd-gtk/menu.c:85
 #, c-format
 msgid "Do you want to disconnect from the Wi-Fi network '%s'?"
-msgstr "Do you want to forget the WiFi network '%s'?"
+msgstr "Do you want to forget the wireless network '%s'?"
 
 #: ../plugins/dhcpcd-gtk/menu.c:86
 msgid "Disconnect Wi-Fi Network"
-msgstr "Disconnect WiFi Network"
+msgstr "Disconnect Wireless LAN"
 
 #: ../plugins/dhcpcd-gtk/menu.c:383
 msgid "No APs found - scanning..."
@@ -109,27 +109,27 @@ msgstr "No APs found - scanning..."
 
 #: ../plugins/dhcpcd-gtk/menu.c:546
 msgid "Wi-Fi country is not set"
-msgstr "WiFi disabled - country not set"
+msgstr "Wireless LAN disabled - country not set"
 
 #: ../plugins/dhcpcd-gtk/menu.c:549
 msgid "Click here to set Wi-Fi country"
-msgstr "Click here to set WiFi country"
+msgstr "Click here to set wireless LAN country"
 
 #: ../plugins/dhcpcd-gtk/menu.c:555
 msgid "Turn On Wi-Fi"
-msgstr "Turn On WiFi"
+msgstr "Turn On Wireless LAN"
 
 #: ../plugins/dhcpcd-gtk/menu.c:565
 msgid "No wireless interfaces found"
-msgstr "No wireless interfaces found"
+msgstr "No wireless LAN interfaces found"
 
 #: ../plugins/dhcpcd-gtk/menu.c:595
 msgid "Turn Off Wi-Fi"
-msgstr "Turn Off WiFi"
+msgstr "Turn Off Wireless LAN"
 
 #: ../plugins/dhcpcd-gtk/menu.c:604
 msgid "This Wi-Fi device cannot be turned off"
-msgstr "This WiFi device cannot be turned off"
+msgstr "This wireless LAN device cannot be turned off"
 
 #: ../plugins/dhcpcd-gtk/menu.c:682
 msgid "_Preferences"
@@ -260,7 +260,7 @@ msgstr "Could not write configuration"
 
 #: ../plugins/dhcpcd-gtk/wpa.c:205
 msgid "Pre Shared Key:"
-msgstr "Pre Shared Key:"
+msgstr "Pre-shared Key:"
 
 #: ../plugins/dhcpcd-gtk/wpa.c:219
 msgid "Hide characters"
