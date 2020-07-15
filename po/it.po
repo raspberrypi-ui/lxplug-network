@@ -1,0 +1,268 @@
+# English translations for lxplug_dhcpcdui package.
+# Copyright (C) 2018 Raspberry Pi Ltd
+# This file is distributed under the same license as the lxplug_dhcpcdui package.
+# Emanuele Goldoni <emanuele.goldoni@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lxplug_dhcpcdui 0.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-11 18:17+0200\n"
+"PO-Revision-Date: 2020-07-13 16:05+0200\n"
+"Last-Translator: Emanuele Goldoni <emanuele.goldoni@gmail.com>\n"
+"Language-Team: Italian\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.3\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:337
+msgid "Error creating new GIO Channel\n"
+msgstr "Errore nella creazione di un nuovo GIO Channel\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:342
+msgid "Error creating watch\n"
+msgstr "Error nella creazione di watch per il GIO Channel\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:349
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:380
+#, c-format
+msgid "Status changed to %s"
+msgstr "Lo stato è cambiato in %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:383
+msgid "Connection to dhcpcd lost"
+msgstr "Connessione a dhcpcd persa"
+
+#: ../plugins/dhcpcd-gtk/main.c:383
+msgid "dhcpcd not running"
+msgstr "dhcpcd non è in esecuzione"
+
+#: ../plugins/dhcpcd-gtk/main.c:405
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "Connesso a %s-%s"
+
+#: ../plugins/dhcpcd-gtk/main.c:423
+msgid "dhcpcd connection lost"
+msgstr "Connessione dhcpcd persa"
+
+#: ../plugins/dhcpcd-gtk/main.c:493
+msgid "Network event"
+msgstr "Evento di rete"
+
+#: ../plugins/dhcpcd-gtk/main.c:535
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "Connessione dhcpcd WPA persa: %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:597
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: risultati ricevuti dalla scansione"
+
+#: ../plugins/dhcpcd-gtk/main.c:622
+msgid "New Access Point"
+msgstr "Nuovo Access Point"
+
+#: ../plugins/dhcpcd-gtk/main.c:631
+msgid "New Access Points"
+msgstr "Nuovi Access Point"
+
+#: ../plugins/dhcpcd-gtk/main.c:668
+#, c-format
+msgid "%s: WPA status %s"
+msgstr "%s: stato WPA %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:789
+msgid "Connecting to dhcpcd ..."
+msgstr "Connessione a dhcpcd..."
+
+#: ../plugins/dhcpcd-gtk/main.c:795
+msgid "Connecting ..."
+msgstr "Connessione..."
+
+#: ../plugins/dhcpcd-gtk/main.c:855
+msgid "Wireless & Wired Network"
+msgstr "Rete wireless e cablata"
+
+#: ../plugins/dhcpcd-gtk/main.c:856
+msgid "Control for dhcpcd network interface"
+msgstr "Controllo per l'interfaccia di rete dhcpcd"
+
+#: ../plugins/dhcpcd-gtk/menu.c:85
+#, c-format
+msgid "Do you want to disconnect from the Wi-Fi network '%s'?"
+msgstr "Disconnettersi dalla rete Wi-Fi «%s»?"
+
+#: ../plugins/dhcpcd-gtk/menu.c:86
+msgid "Disconnect Wi-Fi Network"
+msgstr "Disconnetti la rete Wi-Fi"
+
+#: ../plugins/dhcpcd-gtk/menu.c:377
+msgid "No APs found - scanning..."
+msgstr "Nessun AP trovato: scansione..."
+
+#: ../plugins/dhcpcd-gtk/menu.c:538
+msgid "Turn On Wi-Fi"
+msgstr "Accendi Wi-Fi"
+
+#: ../plugins/dhcpcd-gtk/menu.c:547
+msgid "No wireless interfaces found"
+msgstr "Nessuna interfaccia wireless trovata"
+
+#: ../plugins/dhcpcd-gtk/menu.c:556
+msgid "Wi-Fi country is not set"
+msgstr "La nazione Wi-Fi non è impostata"
+
+#: ../plugins/dhcpcd-gtk/menu.c:559
+msgid "Click here to set Wi-Fi country"
+msgstr "Fare clic qui per impostare la nazione Wi-Fi"
+
+#: ../plugins/dhcpcd-gtk/menu.c:591
+msgid "Turn Off Wi-Fi"
+msgstr "Spegni Wi-Fi"
+
+#: ../plugins/dhcpcd-gtk/menu.c:601
+msgid "This Wi-Fi device cannot be turned off"
+msgstr "Questo dispositivo Wi-Fi non può essere spento"
+
+#: ../plugins/dhcpcd-gtk/menu.c:679
+msgid "_Preferences"
+msgstr "_Preferenze"
+
+#: ../plugins/dhcpcd-gtk/menu.c:693
+msgid "_About"
+msgstr "_Informazioni"
+
+#: ../plugins/dhcpcd-gtk/menu.c:701
+msgid "_Quit"
+msgstr "_Esci"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error saving"
+msgstr "Errore nel salvataggio di"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error reading"
+msgstr "Errore nella lettura di"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:55
+msgid "Config error"
+msgstr "Errore di configurazione"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:574
+msgid "Network Preferences"
+msgstr "Preferenze di rete"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:586
+msgid "Configure:"
+msgstr "Configura:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:632
+msgid "Automatically configure empty options"
+msgstr "Configura automaticamente le opzioni vuote"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:635
+msgid "Disable IPv6"
+msgstr "Disabilita IPv6"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:651
+msgid "IPv4 Address:"
+msgstr "Indirizzo IPv4:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:659
+msgid "IPv6 Address:"
+msgstr "Indirizzo IPv6:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:667
+msgid "Router:"
+msgstr "Gateway:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:675
+msgid "DNS Servers:"
+msgstr "Server DNS:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:682
+msgid "DNS Search:"
+msgstr "Ricerca DNS:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:688
+msgid "C_lear"
+msgstr "Pu_lisci"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:703
+msgid "The dhcpcd configuration file is not writeable"
+msgstr "Il file di configurazione di dhcpcd non è scrivibile"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "Disconnessione non riuscita."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:79
+msgid "Failed to reconfigure."
+msgstr "Riconfigurazione non riuscita."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "Impostazione della gestione della chiave non riuscita."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "Impostazione della password non riuscita: probabilmente è troppo corta."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "Abilitazione della rete non riuscita."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "Selezione della rete non riuscita."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "Associazione alla rete non riuscita."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"Salvataggio della configurazione di wpa_supplicant non riuscito.\n"
+"\n"
+"Aggiungere update_config=1 a /etc/wpa_supplicant.conf."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "Errore abilitando la rete"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113 ../plugins/dhcpcd-gtk/wpa.c:118
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Error disconnecting network"
+msgstr "Errore disconnettendo la rete"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113
+msgid "Could not find SSID to disconnect"
+msgstr "Impossibile trovare SSID dal quale disconnettersi"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:118
+msgid "Could not remove network"
+msgstr "Impossibile rimuovere la rete"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Could not write configuration"
+msgstr "Impossibile scrivere la configurazione"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:206
+msgid "Pre Shared Key:"
+msgstr "Chiave condivisa (PSK):"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:220
+msgid "Hide characters"
+msgstr "Nascondi caratteri"
