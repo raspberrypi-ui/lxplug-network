@@ -1,0 +1,269 @@
+# Norwegian Bokmål translations for lxplug_dhcpcdui package.
+# Copyright (C) 2018 Raspberry Pi Ltd
+# This file is distributed under the same license as the lxplug_dhcpcdui package.
+# Simon Long <simon@raspberrypi.org>, 2018.
+# Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lxplug_dhcpcdui 0.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-07-12 15:06+0100\n"
+"PO-Revision-Date: 2020-09-29 06:45+0200\n"
+"Last-Translator: Imre Kristoffer Eilertsen <imreeil42@gmail.com>\n"
+"Language-Team: Norwegian Bpkmål\n"
+"Language: nb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.1\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:368
+msgid "Error creating new GIO Channel\n"
+msgstr "Feil under oppretting av ny GIO-kanal\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:373
+msgid "Error creating watch\n"
+msgstr "Feil under oppretting av overvåking\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:380
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:411
+#, c-format
+msgid "Status changed to %s"
+msgstr "Status endret til %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:414
+msgid "Connection to dhcpcd lost"
+msgstr "Tilkoblingen til dhcpcd forsvant"
+
+#: ../plugins/dhcpcd-gtk/main.c:414
+msgid "dhcpcd not running"
+msgstr "dhcpcd kjører ikke"
+
+#: ../plugins/dhcpcd-gtk/main.c:436
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "Koblet til %s-%s"
+
+#: ../plugins/dhcpcd-gtk/main.c:454
+msgid "dhcpcd connection lost"
+msgstr "dhcpcd-tilkoblingen forsvant"
+
+#: ../plugins/dhcpcd-gtk/main.c:524
+msgid "Network event"
+msgstr "Nettverkshendelse"
+
+#: ../plugins/dhcpcd-gtk/main.c:566
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "dhcpcd-WPA-tilkoblingen forsvant: %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:628
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: Mottok skanneresultater"
+
+#: ../plugins/dhcpcd-gtk/main.c:653
+msgid "New Access Point"
+msgstr "Nytt tilgangspunkt"
+
+#: ../plugins/dhcpcd-gtk/main.c:662
+msgid "New Access Points"
+msgstr "Nye tilgangspunkter"
+
+#: ../plugins/dhcpcd-gtk/main.c:699
+#, c-format
+msgid "%s: WPA status %s"
+msgstr "%s: WPA-status %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:819
+msgid "Connecting to dhcpcd ..."
+msgstr "Kobler til dhcpcd …"
+
+#: ../plugins/dhcpcd-gtk/main.c:825
+msgid "Connecting ..."
+msgstr "Kobler til …"
+
+#: ../plugins/dhcpcd-gtk/main.c:866
+msgid "Wireless & Wired Network"
+msgstr "Trådløst og kablet nettverk"
+
+#: ../plugins/dhcpcd-gtk/main.c:867
+msgid "Control for dhcpcd network interface"
+msgstr "Styring for dhcpcd-nettverksgrensesnittet"
+
+#: ../plugins/dhcpcd-gtk/menu.c:85
+#, c-format
+msgid "Do you want to disconnect from the Wi-Fi network '%s'?"
+msgstr "Vil du koble fra Wi-Fi-nettverket '%s'?"
+
+#: ../plugins/dhcpcd-gtk/menu.c:86
+msgid "Disconnect Wi-Fi Network"
+msgstr "Koble fra Wi-Fi-nettverk"
+
+#: ../plugins/dhcpcd-gtk/menu.c:383
+msgid "No APs found - scanning..."
+msgstr "Ingen tilgangspunkter funnet - skanner …"
+
+#: ../plugins/dhcpcd-gtk/menu.c:546
+msgid "Wi-Fi country is not set"
+msgstr "Wi-Fi-landet er ikke angitt"
+
+#: ../plugins/dhcpcd-gtk/menu.c:549
+msgid "Click here to set Wi-Fi country"
+msgstr "Klikk her for å velge Wi-Fi-land"
+
+#: ../plugins/dhcpcd-gtk/menu.c:555
+msgid "Turn On Wi-Fi"
+msgstr "Skru på Wi-Fi"
+
+#: ../plugins/dhcpcd-gtk/menu.c:565
+msgid "No wireless interfaces found"
+msgstr "Ingen trådløse grensesnitt ble funnet"
+
+#: ../plugins/dhcpcd-gtk/menu.c:595
+msgid "Turn Off Wi-Fi"
+msgstr "Skru av Wi-Fi"
+
+#: ../plugins/dhcpcd-gtk/menu.c:604
+msgid "This Wi-Fi device cannot be turned off"
+msgstr "Denne Wi-Fi-enheten kan ikke slås av"
+
+#: ../plugins/dhcpcd-gtk/menu.c:682
+msgid "_Preferences"
+msgstr "_Brukervalg"
+
+#: ../plugins/dhcpcd-gtk/menu.c:696
+msgid "_About"
+msgstr "_Om"
+
+#: ../plugins/dhcpcd-gtk/menu.c:704
+msgid "_Quit"
+msgstr "A_vslutt"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error saving"
+msgstr "Feil under lagring"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error reading"
+msgstr "Feil under innlesning"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:55
+msgid "Config error"
+msgstr "Oppsettsfeil"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:574
+msgid "Network Preferences"
+msgstr "Brukervalg for nettverk"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:586
+msgid "Configure:"
+msgstr "Konfigurer:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:632
+msgid "Automatically configure empty options"
+msgstr "Konfigurer tomme alternativer automatisk"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:635
+msgid "Disable IPv6"
+msgstr "Skru av IPv6"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:651
+msgid "IPv4 Address:"
+msgstr "IPv4-adresse:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:659
+msgid "IPv6 Address:"
+msgstr "IPv6-adresse:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:667
+msgid "Router:"
+msgstr "Ruter:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:675
+msgid "DNS Servers:"
+msgstr "DNS-tjenere:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:682
+msgid "DNS Search:"
+msgstr "DNS-søk:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:688
+msgid "C_lear"
+msgstr "_Tøm"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:703
+msgid "The dhcpcd configuration file is not writeable"
+msgstr "dhcpcd-konfigurasjonsfilen er ikke skrivbar"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "Mislyktes i å koble fra."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:79
+msgid "Failed to reconfigure."
+msgstr "Mislyktes i å rekonfigurere."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "Mislyktes i å angi nøkkelbehandling."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "Mislyktes i å bestemme passordet, sannsynligvis for kort."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "Mislyktes i å aktivere nettverket."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "Mislyktes i å velge nettverket."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "Mislyktes i å starte tilknytningen."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"Mislyktes i å lagre 'wpa_supplicant'-oppsettet.\n"
+"\n"
+"Du burde legge til update_config=1 hos /etc/wpa_supplicant.conf."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "Feil under aktivering av nettverk"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113 ../plugins/dhcpcd-gtk/wpa.c:118
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Error disconnecting network"
+msgstr "Feil under frakobling av nettverk"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113
+msgid "Could not find SSID to disconnect"
+msgstr "Klarte ikke å finne SSID-en som skal kobles fra"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:118
+msgid "Could not remove network"
+msgstr "Klarte ikke å fjerne nettverket"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Could not write configuration"
+msgstr "Klarte ikke å lagre oppsettet"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:205
+msgid "Pre Shared Key:"
+msgstr "Forhåndsdelt nøkkel:"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:219
+msgid "Hide characters"
+msgstr "Skjul tegn"
