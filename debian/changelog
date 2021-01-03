@@ -1,3 +1,9 @@
+lxplug-network (0.23) buster; urgency=medium
+
+  * Added Slovak translation
+
+ -- Simon Long <simon@raspberrypi.com>  Sun, 03 Jan 2021 21:53:47 +0000
+
 lxplug-network (0.22) buster; urgency=medium
 
   * Norwegian translation added
