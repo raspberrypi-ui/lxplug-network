@@ -191,8 +191,13 @@ wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
     dhcp->wpa_dialog = gtk_dialog_new_with_buttons(s.ssid,
         NULL,
         GTK_DIALOG_MODAL,
+#if GTK_CHECK_VERSION(3, 0, 0)
+        _("_Cancel"), GTK_RESPONSE_REJECT,
+        _("_OK"), GTK_RESPONSE_ACCEPT,
+#else
         GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
         GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+#endif
         NULL);
     gtk_window_set_position(GTK_WINDOW(dhcp->wpa_dialog), GTK_WIN_POS_MOUSE);
     gtk_window_set_resizable(GTK_WINDOW(dhcp->wpa_dialog), false);
