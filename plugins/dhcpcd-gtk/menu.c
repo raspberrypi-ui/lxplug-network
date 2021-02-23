@@ -595,7 +595,7 @@ menu_show (DHCPCDUIPlugin *data)
         TAILQ_FOREACH(w, &data->wi_scans, next) {
 #if GTK_CHECK_VERSION(3, 0, 0)
             item = gtk_menu_item_new ();
-            GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+            GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, MENU_ICON_SPACE);
             GtkWidget *label = gtk_label_new (w->interface->ifname);
             image = gtk_image_new ();
             lxpanel_plugin_set_menu_icon (data->panel, image, "network-wireless");
