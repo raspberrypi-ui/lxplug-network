@@ -191,12 +191,8 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
     m->associated = is_associated(wi, scan);
     if (m->associated) lxpanel_plugin_set_menu_icon (dhcp->panel, sel, "dialog-ok-apply");
 #if GTK_CHECK_VERSION(3, 0, 0)
-    GtkWidget *box = gtk_bin_get_child (GTK_BIN (m->menu));
-    GList *children = gtk_container_get_children (GTK_CONTAINER (box));
-    GtkWidget *img = (GtkWidget *) children->data;
-    gtk_container_remove (GTK_CONTAINER (box), img);
-    gtk_box_pack_start (GTK_BOX (box), sel, FALSE, FALSE, 0);
-    gtk_box_reorder_child (GTK_BOX (box), sel, 0);
+    else lxpanel_plugin_set_menu_icon (dhcp->panel, sel, NULL);
+    lxpanel_plugin_update_menu_icon (m->menu, sel);
 #else
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
 #endif
@@ -234,7 +230,7 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     wim = g_malloc(sizeof(*wim));
     wim->scan = scan;
 #if GTK_CHECK_VERSION(3, 0, 0)
-    wim->menu = gtk_menu_item_new();
+    wim->menu = gtk_menu_item_new ();
 #else
     wim->menu = gtk_image_menu_item_new();
     gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (wim->menu), TRUE);
@@ -401,7 +397,12 @@ add_scans(WI_SCAN *wi, GtkWidget *p)
     if (wi->scans == NULL)
     {
         m = gtk_menu_new ();
+#if GTK_CHECK_VERSION(3, 0, 0)
+        DHCPCDUIPlugin *dhcp = lxpanel_plugin_get_data (p);
+        wi->noap = lxpanel_plugin_new_menu_item (dhcp->panel, _("No APs found - scanning..."), 0, NULL);
+#else
         wi->noap = gtk_menu_item_new_with_label (_("No APs found - scanning..."));
+#endif
         gtk_widget_set_sensitive (wi->noap, FALSE);
         gtk_menu_shell_append(GTK_MENU_SHELL(m), wi->noap);
         return m;
@@ -562,7 +563,11 @@ menu_show (DHCPCDUIPlugin *data)
     {
         // rfkill installed, h/w found, disabled
         data->menu = gtk_menu_new ();
+#if GTK_CHECK_VERSION(3, 0, 0)
+        item = lxpanel_plugin_new_menu_item (data->panel, _("Turn On Wi-Fi"), 0, NULL);
+#else
         item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
+#endif
         g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
         gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
     }
@@ -571,7 +576,11 @@ menu_show (DHCPCDUIPlugin *data)
         if ((w = TAILQ_FIRST(&data->wi_scans)) == NULL)
         {
             data->menu = gtk_menu_new ();
+#if GTK_CHECK_VERSION(3, 0, 0)
+            item = lxpanel_plugin_new_menu_item (data->panel, _("No wireless interfaces found"), 0, NULL);
+#else
             item = gtk_menu_item_new_with_label (_("No wireless interfaces found"));
+#endif
             gtk_widget_set_sensitive (item, FALSE);
             gtk_menu_shell_append (GTK_MENU_SHELL(data->menu), item);
         }
@@ -580,10 +589,18 @@ menu_show (DHCPCDUIPlugin *data)
             if (wcountry == 0)
             {
                 data->menu = gtk_menu_new ();
+#if GTK_CHECK_VERSION(3, 0, 0)
+                item = lxpanel_plugin_new_menu_item (data->panel, _("Wi-Fi country is not set"), 0, NULL);
+#else
                 item = gtk_menu_item_new_with_label (_("Wi-Fi country is not set"));
+#endif
                 gtk_widget_set_sensitive (item, FALSE);
                 gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
+#if GTK_CHECK_VERSION(3, 0, 0)
+                item = lxpanel_plugin_new_menu_item (data->panel, _("Click here to set Wi-Fi country"), 0, NULL);
+#else
                 item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
+#endif
                 g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
                 gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
             }
@@ -594,14 +611,7 @@ menu_show (DHCPCDUIPlugin *data)
         data->menu = gtk_menu_new();
         TAILQ_FOREACH(w, &data->wi_scans, next) {
 #if GTK_CHECK_VERSION(3, 0, 0)
-            item = gtk_menu_item_new ();
-            GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, MENU_ICON_SPACE);
-            GtkWidget *label = gtk_label_new (w->interface->ifname);
-            image = gtk_image_new ();
-            lxpanel_plugin_set_menu_icon (data->panel, image, "network-wireless");
-            gtk_container_add (GTK_CONTAINER (item), box);
-            gtk_container_add (GTK_CONTAINER (box), image);
-            gtk_container_add (GTK_CONTAINER (box), label);
+            item = lxpanel_plugin_new_menu_item (data->panel, w->interface->ifname, 0, "network-wireless");
 #else
             item = gtk_image_menu_item_new_with_label(
                 w->interface->ifname);
@@ -629,7 +639,11 @@ menu_show (DHCPCDUIPlugin *data)
                     // rfkill installed, h/w found, enabled
                     item = gtk_separator_menu_item_new ();
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+#if GTK_CHECK_VERSION(3, 0, 0)
+                    item = lxpanel_plugin_new_menu_item (data->panel, _("Turn Off Wi-Fi"), 0, NULL);
+#else
                     item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
+#endif
                     g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
                 }
@@ -639,7 +653,11 @@ menu_show (DHCPCDUIPlugin *data)
                     // rfkill is installed, but can't control the hardware
                     item = gtk_separator_menu_item_new ();
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
+#if GTK_CHECK_VERSION(3, 0, 0)
+                    item = lxpanel_plugin_new_menu_item (data->panel, _("This Wi-Fi device cannot be turned off"), 0, NULL);
+#else
                     item = gtk_menu_item_new_with_label (_("This Wi-Fi device cannot be turned off"));
+#endif
                     gtk_widget_set_sensitive (item, FALSE);
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
                 }
