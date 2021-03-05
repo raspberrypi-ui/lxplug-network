@@ -373,7 +373,11 @@ menu_remove_if(WI_SCAN *wi, DHCPCDUIPlugin * dhcp)
         while ((children = g_list_next(children)) != NULL)
         {
             GtkWidget *item = children->data;
+#if GTK_CHECK_VERSION(3, 0, 0)
+            if (!strcmp (lxpanel_plugin_get_menu_label (item), wi->interface->ifname))
+#else
             if (!strcmp (gtk_menu_item_get_label (GTK_MENU_ITEM(item)), wi->interface->ifname))
+#endif
                 gtk_widget_destroy (GTK_WIDGET(item));
         }
     }
