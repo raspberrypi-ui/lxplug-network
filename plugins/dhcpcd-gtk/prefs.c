@@ -645,6 +645,7 @@ prefs_show(DHCPCDUIPlugin *dhcp)
 #if GTK_CHECK_VERSION(3, 0, 0)
 #define attach_label(a, b, c, d, e)                       \
     do {                                      \
+        gtk_label_set_xalign (GTK_LABEL(a), 0.0); \
         gtk_grid_attach(GTK_GRID(table), a, b, d, c - b, e - d);      \
     } while (0)
 #define attach_entry(a, b, c, d, e)                       \
