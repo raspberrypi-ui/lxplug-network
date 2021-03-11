@@ -1,0 +1,268 @@
+# Icelandic translation for lxplug-network package.
+# Copyright (C) 2021 Free Software Foundation, Inc.
+# This file is distributed under the same license as the lxplug-network package.
+#
+# Sveinn í Felli <sv1@fellsnet.is>, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-04-21 22:24+0300\n"
+"PO-Revision-Date: 2021-03-05 13:56+0000\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>\n"
+"Language-Team: Icelandic <translation-team-is@lists.sourceforge.net>\n"
+"Language: is\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:368
+msgid "Error creating new GIO Channel\n"
+msgstr "Villa við að búa til nýja GIO-rás\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:373
+msgid "Error creating watch\n"
+msgstr "Villa við að útbúa vöktun\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:380
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:411
+#, c-format
+msgid "Status changed to %s"
+msgstr "Staða breyttist í %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:414
+msgid "Connection to dhcpcd lost"
+msgstr "Tenging við dhcpcd rofnaði"
+
+#: ../plugins/dhcpcd-gtk/main.c:414
+msgid "dhcpcd not running"
+msgstr "dhcpcd ekki keyrandi"
+
+#: ../plugins/dhcpcd-gtk/main.c:436
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "Tengt við %s-%s"
+
+#: ../plugins/dhcpcd-gtk/main.c:454
+msgid "dhcpcd connection lost"
+msgstr "Tenging við dhcpcd rofnaði"
+
+#: ../plugins/dhcpcd-gtk/main.c:524
+msgid "Network event"
+msgstr "Atvik í netkerfi"
+
+#: ../plugins/dhcpcd-gtk/main.c:566
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "WPA-tenging við dhcpcd rofnaði"
+
+#: ../plugins/dhcpcd-gtk/main.c:628
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: Fékk niðurstöður skönnunar"
+
+#: ../plugins/dhcpcd-gtk/main.c:653
+msgid "New Access Point"
+msgstr "Nýr aðgangsstaður"
+
+#: ../plugins/dhcpcd-gtk/main.c:662
+msgid "New Access Points"
+msgstr "Nýir aðgangsstaðir"
+
+#: ../plugins/dhcpcd-gtk/main.c:699
+#, c-format
+msgid "%s: WPA status %s"
+msgstr "%s: Staða WPA %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:819
+msgid "Connecting to dhcpcd ..."
+msgstr "Tengist við dhcpcd ..."
+
+#: ../plugins/dhcpcd-gtk/main.c:825
+msgid "Connecting ..."
+msgstr "Tengist ..."
+
+#: ../plugins/dhcpcd-gtk/main.c:866
+msgid "Wireless & Wired Network"
+msgstr "Þráðlaus og kapaltengd net"
+
+#: ../plugins/dhcpcd-gtk/main.c:867
+msgid "Control for dhcpcd network interface"
+msgstr "Stýring á dhcpcd netkorti"
+
+#: ../plugins/dhcpcd-gtk/menu.c:85
+#, c-format
+msgid "Do you want to disconnect from the Wi-Fi network '%s'?"
+msgstr "Viltu aftengjast Wi-Fi netkerfinu '%s'?"
+
+#: ../plugins/dhcpcd-gtk/menu.c:86
+msgid "Disconnect Wi-Fi Network"
+msgstr "Aftengja Wi-Fi netkerfi"
+
+#: ../plugins/dhcpcd-gtk/menu.c:383
+msgid "No APs found - scanning..."
+msgstr "Engir aðgangsstaðir fundnir - skanna..."
+
+#: ../plugins/dhcpcd-gtk/menu.c:546
+msgid "Wi-Fi country is not set"
+msgstr "Land Wi-Fi ekki stillt"
+
+#: ../plugins/dhcpcd-gtk/menu.c:549
+msgid "Click here to set Wi-Fi country"
+msgstr "Smelltu hér til að stilla land Wi-Fi kerfis"
+
+#: ../plugins/dhcpcd-gtk/menu.c:555
+msgid "Turn On Wi-Fi"
+msgstr "Kveikja á þráðlausu Wi-Fi-neti"
+
+#: ../plugins/dhcpcd-gtk/menu.c:565
+msgid "No wireless interfaces found"
+msgstr "Engin þráðlaus nettæki fundust"
+
+#: ../plugins/dhcpcd-gtk/menu.c:595
+msgid "Turn Off Wi-Fi"
+msgstr "Slökkva á þráðlausu Wi-Fi-neti"
+
+#: ../plugins/dhcpcd-gtk/menu.c:604
+msgid "This Wi-Fi device cannot be turned off"
+msgstr "Ekki er hægt að slökkva á þessu Wi-Fi-tæki"
+
+#: ../plugins/dhcpcd-gtk/menu.c:682
+msgid "_Preferences"
+msgstr "_Kjörstillingar"
+
+#: ../plugins/dhcpcd-gtk/menu.c:696
+msgid "_About"
+msgstr "_Um hugbúnaðinn"
+
+#: ../plugins/dhcpcd-gtk/menu.c:704
+msgid "_Quit"
+msgstr "_Hætta"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error saving"
+msgstr "Villa við að vista"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error reading"
+msgstr "Villa við lestur"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:55
+msgid "Config error"
+msgstr "Villa í uppsetningu"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:574
+msgid "Network Preferences"
+msgstr "Stillingar netkerfis"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:586
+msgid "Configure:"
+msgstr "Stilla:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:632
+msgid "Automatically configure empty options"
+msgstr "Stilla auða valkosti sjálfvirkt"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:635
+msgid "Disable IPv6"
+msgstr "Gera IPv6 óvirkt"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:651
+msgid "IPv4 Address:"
+msgstr "IPv4-vistfang:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:659
+msgid "IPv6 Address:"
+msgstr "IPv6-vistfang:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:667
+msgid "Router:"
+msgstr "Beinir:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:675
+msgid "DNS Servers:"
+msgstr "DNS-þjónar:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:682
+msgid "DNS Search:"
+msgstr "DNS leit:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:688
+msgid "C_lear"
+msgstr "_Hreinsa"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:703
+msgid "The dhcpcd configuration file is not writeable"
+msgstr "Stillingaskrá dhcpcd er ekki ritanleg"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "Tókst ekki að aftengjast."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:79
+msgid "Failed to reconfigure."
+msgstr "Mistókst að endurstilla."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "Mistókst að stilla umsýslu aðgangslykla."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "Mistókst að stilla lykilorð, líklega er það of stutt."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "Mistókst að virkja netkerfið."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "Mistókst að velja netkerfið."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "Tókst ekki að ræsa vensl."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"Mistókst að vista uppsetningu wpa_supplicant.\n"
+"\n"
+"Þú ættir að bæta update_config=1 í skrána /etc/wpa_supplicant.conf."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "Villa við að virkja netkerfi"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113 ../plugins/dhcpcd-gtk/wpa.c:118
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Error disconnecting network"
+msgstr "Villa við að aftengja netkerfi"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113
+msgid "Could not find SSID to disconnect"
+msgstr "Gat ekki fundið SSID til að aftengjast"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:118
+msgid "Could not remove network"
+msgstr "Gat ekki fjarlægt netkerfi"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Could not write configuration"
+msgstr "Gat ekki skrifað uppsetningu"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:205
+msgid "Pre Shared Key:"
+msgstr "Fordeildur lykill"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:219
+msgid "Hide characters"
+msgstr "Fela stafi"
