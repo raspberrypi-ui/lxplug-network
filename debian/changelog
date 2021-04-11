@@ -1,4 +1,4 @@
-lxplug-network (0.25) buster; urgency=medium
+lxplug-network (0.25) bullseye; urgency=medium
 
   * GTK+3 version
 
