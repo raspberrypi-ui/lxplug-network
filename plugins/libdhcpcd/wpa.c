@@ -150,7 +150,6 @@ dhcpcd_wpa_command(DHCPCD_WPA *wpa, const char *cmd)
 {
 	char buf[10];
 	ssize_t bytes;
-
 	bytes = wpa_cmd(wpa->command_fd, cmd, buf, sizeof(buf));
 	return (bytes == -1 || bytes == 0 ||
 	    strcmp(buf, "OK\n")) ? false : true;
@@ -859,10 +858,6 @@ dhcpcd_wpa_network_find_new(DHCPCD_WPA *wpa, const char *ssid)
 	ssize_t dl, i;
 	char *dp;
 
-	id = dhcpcd_wpa_network_find(wpa, ssid);
-	if (id != -1)
-		return id;
-
 	dl = dhcpcd_decode_string_escape(dssid, sizeof(dssid), ssid);
 	if (dl == -1)
 		return -1;
@@ -891,11 +886,18 @@ dhcpcd_wpa_network_find_new(DHCPCD_WPA *wpa, const char *ssid)
 	}
 	*ep = '\0';
 
+	strcpy(wpa->userconnect_ssid,essid);
+
+	id = dhcpcd_wpa_network_find(wpa, ssid);
+		if (id != -1)
+			return id;
+
 	id = dhcpcd_wpa_network_new(wpa);
 	if (id != -1)
 		dhcpcd_wpa_network_set(wpa, id, "ssid", essid);
 	return id;
 }
+
 
 void
 dhcpcd_wpa_close(DHCPCD_WPA *wpa)
@@ -1080,6 +1082,14 @@ dhcpcd_wpa_set_scan_callback(DHCPCD_CONNECTION *con,
 	con->wi_scanresults_context = context;
 }
 
+void
+dhcpcd_wpa_set_error_callback(DHCPCD_CONNECTION *con,
+    void (*cb)(DHCPCD_WPA *, void *), void *context)
+{
+	assert(con);
+	con->wi_error_cb = cb;
+	con->wi_error_context = context;
+}
 
 void dhcpcd_wpa_set_status_callback(DHCPCD_CONNECTION * con,
     void (*cb)(DHCPCD_WPA *, unsigned int, const char *, void *),
@@ -1123,6 +1133,17 @@ dhcpcd_wpa_dispatch(DHCPCD_WPA *wpa)
 	    wpa->con->wi_scanresults_cb)
 		wpa->con->wi_scanresults_cb(wpa,
 		    wpa->con->wi_scanresults_context);
+	else if (strncmp(p, "Trying to associate with SSID ", strlen("Trying to associate with SSID ")) == 0) {
+		strcpy(wpa->connect_ssid, p+strlen("Trying to associate with SSID "));
+	}
+	else if (strncmp(p, "CTRL-EVENT-ASSOC-REJECT", strlen("CTRL-EVENT-ASSOC-REJECT")) == 0 ) {
+		if (((strlen(wpa->userconnect_ssid)) != 0) && (strncmp(wpa->userconnect_ssid + 1, wpa->connect_ssid + 1, strlen(wpa->userconnect_ssid) - 2) == 0)) {
+			if (wpa->con->wi_error_cb) {
+				wpa->con->wi_error_cb(wpa,wpa->con->wi_error_context);
+			}
+		}
+        memset(wpa->userconnect_ssid,0,IF_SSIDSIZE);
+	}
 	else if (strncmp(p, CE_CONNECTED, strlen(CE_CONNECTED)) == 0)
 		dhcpcd_wpa_if_freq(wpa);
 	else if (strncmp(p, CE_DISCONNECTED, strlen(CE_DISCONNECTED)) == 0)
