@@ -374,6 +374,7 @@ menu_remove_if(WI_SCAN *wi, DHCPCDUIPlugin * dhcp)
     {
         /* if there are multiple interfaces and hence a top-level menu, remove the entry for the removed interface */
         GList *children = gtk_container_get_children (GTK_CONTAINER(dhcp->menu));
+        GList *head = children;
         while ((children = g_list_next(children)) != NULL)
         {
             GtkWidget *item = children->data;
@@ -384,6 +385,7 @@ menu_remove_if(WI_SCAN *wi, DHCPCDUIPlugin * dhcp)
 #endif
                 gtk_widget_destroy (GTK_WIDGET(item));
         }
+        g_list_free (head);
     }
     wi->ifmenu = NULL;
     while ((wim = TAILQ_FIRST(&wi->menus))) {
