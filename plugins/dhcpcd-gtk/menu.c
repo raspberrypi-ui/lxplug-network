@@ -76,44 +76,43 @@ wi_scan_find(DHCPCD_WI_SCAN *scan, GtkWidget *p)
     return NULL;
 }
 
-static void disconnect_prompt (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
+static void handle_ok (GtkButton *button, gpointer user_data)
 {
-    GtkWidget *dlg, *lbl;
-    char buffer[256];
-    int res;
+    DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) user_data;
+    wpa_disconnect (dhcp->disc_wpa, dhcp->disc_scan);
+    gtk_widget_destroy (dhcp->disc_dlg);
+}
 
-    sprintf (buffer, _("Do you want to disconnect from the Wi-Fi network '%s'?"), scan->ssid);
-#if GTK_CHECK_VERSION(3, 0, 0)
-    dlg = gtk_dialog_new_with_buttons (_("Disconnect Wi-Fi Network"), NULL, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, _("_Cancel"), 0, _("OK"), 1, NULL);
-#else
-    dlg = gtk_dialog_new_with_buttons (_("Disconnect Wi-Fi Network"), NULL, GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, 0, GTK_STOCK_OK, 1, NULL);
-#endif
-    lbl = gtk_label_new (buffer);
-    gtk_label_set_line_wrap (GTK_LABEL (lbl), TRUE);
-    gtk_label_set_justify (GTK_LABEL (lbl), GTK_JUSTIFY_LEFT);
-#if GTK_CHECK_VERSION(3, 0, 0)
-    gtk_label_set_xalign (GTK_LABEL (lbl), 0.0);
-    gtk_label_set_yalign (GTK_LABEL (lbl), 0.0);
-    gtk_widget_set_margin_start (lbl, 10);
-    gtk_widget_set_margin_end (lbl, 10);
-    gtk_widget_set_margin_top (lbl, 10);
-    gtk_widget_set_margin_bottom (lbl, 10);
-#else
-    gtk_misc_set_alignment (GTK_MISC (lbl), 0.0, 0.0);
-    gtk_misc_set_padding (GTK_MISC (lbl), 10, 10);
-#endif
-    gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dlg))), lbl , TRUE, TRUE, 0);
-    gtk_widget_show_all (dlg);
+static void handle_cancel (GtkButton *button, gpointer user_data)
+{
+    DHCPCDUIPlugin *dhcp = (DHCPCDUIPlugin *) user_data;
+    gtk_widget_destroy (dhcp->disc_dlg);
+}
 
-    // block while waiting for user response
-    res = gtk_dialog_run (GTK_DIALOG (dlg));
-    gtk_widget_destroy (dlg);
-    if (res) wpa_disconnect(wpa, scan);
+static void disconnect_prompt (DHCPCDUIPlugin *dhcp)
+{
+    GtkBuilder *builder;
+    char *buffer;
+
+    builder = gtk_builder_new ();
+    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/ui/lxplug-network.ui", NULL);
+
+    dhcp->disc_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
+    buffer = g_strdup_printf (_("Do you want to disconnect from the Wi-Fi network '%s'?"), dhcp->disc_scan->ssid);
+    gtk_label_set_text (GTK_LABEL (gtk_builder_get_object (builder, "modal_msg")), buffer);
+    g_signal_connect (gtk_builder_get_object (builder, "modal_ok"), "clicked", G_CALLBACK (handle_ok), dhcp);
+    g_signal_connect (gtk_builder_get_object (builder, "modal_cancel"), "clicked", G_CALLBACK (handle_cancel), dhcp);
+    gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_pb")));
+    g_object_unref (builder);
+
+    gtk_widget_show (dhcp->disc_dlg);
+    g_free (buffer);
 }
 
 static void
 ssid_hook(GtkMenuItem *item, GtkWidget *p)
 {
+    DHCPCDUIPlugin *dhcp = lxpanel_plugin_get_data (p);
     DHCPCD_WI_SCAN *scan;
     WI_SCAN *wi;
 
@@ -130,7 +129,11 @@ ssid_hook(GtkMenuItem *item, GtkWidget *p)
             if (wpa)
             {
                 if (dhcpcd_wi_associated(wi->interface, scan))
-                    disconnect_prompt (wpa, scan);
+                {
+                    dhcp->disc_wpa = wpa;
+                    dhcp->disc_scan = scan;
+                    disconnect_prompt (dhcp);
+                }
                 else
                     wpa_configure(wpa, scan);
             }

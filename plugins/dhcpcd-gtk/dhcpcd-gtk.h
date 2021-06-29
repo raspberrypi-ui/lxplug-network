@@ -122,6 +122,11 @@ typedef struct {
     /* WPA dialog */
     GtkWidget *wpa_dialog, *wpa_err;
 
+    /* Disconnect prompt */
+    GtkWidget *disc_dlg;
+    DHCPCD_WPA *disc_wpa;
+    DHCPCD_WI_SCAN *disc_scan;
+
 } DHCPCDUIPlugin;
 
 const char *get_strength_icon_name(int strength);

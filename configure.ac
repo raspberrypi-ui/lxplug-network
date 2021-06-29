@@ -341,6 +341,7 @@ AC_CONFIG_FILES([
     Makefile
     plugins/Makefile
     po/Makefile.in
+    data/Makefile
 ])
 AC_OUTPUT
 
