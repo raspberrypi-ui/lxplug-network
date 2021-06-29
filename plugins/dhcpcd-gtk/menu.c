@@ -94,8 +94,7 @@ static void disconnect_prompt (DHCPCDUIPlugin *dhcp)
     GtkBuilder *builder;
     char *buffer;
 
-    builder = gtk_builder_new ();
-    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/ui/lxplug-network.ui", NULL);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-network.ui");
 
     dhcp->disc_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
     buffer = g_strdup_printf (_("Do you want to disconnect from the Wi-Fi network '%s'?"), dhcp->disc_scan->ssid);

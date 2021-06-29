@@ -30,17 +30,30 @@
 
 //static GtkWidget *wpa_dialog, *wpa_err;
 
+static void clear_dlg (GtkButton *button, gpointer user_data)
+{
+    gtk_widget_destroy (GTK_WIDGET (user_data));
+}
+
 static void
 wpa_show_err(const char *title, const char *txt, DHCPCDUIPlugin *dhcp)
 {
+    GtkBuilder *builder;
+    char *buffer;
 
-    if (dhcp->wpa_err)
-        gtk_widget_destroy(dhcp->wpa_err);
-    dhcp->wpa_err = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
-        GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", txt);
-    gtk_window_set_title(GTK_WINDOW(dhcp->wpa_err), title);
-    gtk_dialog_run(GTK_DIALOG(dhcp->wpa_err));
-    gtk_widget_destroy(dhcp->wpa_err);
+    if (dhcp->wpa_err) gtk_widget_destroy (dhcp->wpa_err);
+
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-network.ui");
+    dhcp->wpa_err = (GtkWidget *) gtk_builder_get_object (builder, "modal");
+    buffer = g_strdup_printf ("%s - %s", title, txt);
+    gtk_label_set_text (GTK_LABEL (gtk_builder_get_object (builder, "modal_msg")), buffer);
+    g_signal_connect (gtk_builder_get_object (builder, "modal_ok"), "clicked", G_CALLBACK (clear_dlg), dhcp->wpa_err);
+    gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_cancel")));
+    gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_pb")));
+    g_object_unref (builder);
+
+    gtk_widget_show (dhcp->wpa_err);
+    g_free (buffer);
 }
 
 static void

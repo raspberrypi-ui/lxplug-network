@@ -42,19 +42,28 @@ static DHCPCD_IF *iface;
 static char **ifaces;
 #endif
 
+static void clear_dlg (GtkButton *button, gpointer user_data)
+{
+    gtk_widget_destroy (GTK_WIDGET (user_data));
+}
+
 static void
 config_err_dialog(DHCPCD_CONNECTION *con, bool writing, const char *txt)
 {
+    GtkBuilder *builder;
     GtkWidget *edialog;
     char *t;
 
-    t = g_strconcat(_(writing ? _("Error saving") : _("Error reading")), " ",
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-network.ui");
+    edialog = (GtkWidget *) gtk_builder_get_object (builder, "modal");
+    t = g_strconcat(_("Config error"), " - ", _(writing ? _("Error saving") : _("Error reading")), " ",
         dhcpcd_cffile(con), "\n\n", txt, NULL);
-    edialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
-        GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", t);
-    gtk_window_set_title(GTK_WINDOW(edialog), _("Config error"));
-    gtk_dialog_run(GTK_DIALOG(edialog));
-    gtk_widget_destroy(edialog);
+    gtk_label_set_text (GTK_LABEL (gtk_builder_get_object (builder, "modal_msg")), t);
+    g_signal_connect (gtk_builder_get_object (builder, "modal_ok"), "clicked", G_CALLBACK (clear_dlg), edialog);
+    gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_cancel")));
+    gtk_widget_hide (GTK_WIDGET (gtk_builder_get_object (builder, "modal_pb")));
+    g_object_unref (builder);
+    gtk_widget_show (edialog);
     g_free(t);
 }
 
