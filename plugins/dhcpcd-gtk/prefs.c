@@ -54,7 +54,7 @@ config_err_dialog(DHCPCD_CONNECTION *con, bool writing, const char *txt)
     GtkWidget *edialog;
     char *t;
 
-    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-network.ui");
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxpanel-modal.ui");
     edialog = (GtkWidget *) gtk_builder_get_object (builder, "modal");
     t = g_strconcat(_("Config error"), " - ", _(writing ? _("Error saving") : _("Error reading")), " ",
         dhcpcd_cffile(con), "\n\n", txt, NULL);

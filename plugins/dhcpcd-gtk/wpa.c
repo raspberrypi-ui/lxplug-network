@@ -43,7 +43,7 @@ wpa_show_err(const char *title, const char *txt, DHCPCDUIPlugin *dhcp)
 
     if (dhcp->wpa_err) gtk_widget_destroy (dhcp->wpa_err);
 
-    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxplug-network.ui");
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxpanel-modal.ui");
     dhcp->wpa_err = (GtkWidget *) gtk_builder_get_object (builder, "modal");
     buffer = g_strdup_printf ("%s - %s", title, txt);
     gtk_label_set_text (GTK_LABEL (gtk_builder_get_object (builder, "modal_msg")), buffer);
