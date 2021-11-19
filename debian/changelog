@@ -1,3 +1,9 @@
+lxplug-network (0.29) bullseye; urgency=medium
+
+  * Remove scan results message
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 19 Nov 2021 16:41:48 +0000
+
 lxplug-network (0.28) bullseye; urgency=medium
 
   * Use standard modal UI for disconnect prompt
