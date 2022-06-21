@@ -198,11 +198,10 @@ update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
     g_object_set_data(G_OBJECT(m->menu), "dhcpcd_wi_scan", scan);
 
     m->associated = is_associated(wi, scan);
-    if (m->associated) lxpanel_plugin_set_menu_icon (dhcp->panel, sel, "dialog-ok-apply");
 #if GTK_CHECK_VERSION(3, 0, 0)
-    else lxpanel_plugin_set_menu_icon (dhcp->panel, sel, NULL);
-    lxpanel_plugin_update_menu_icon (m->menu, sel);
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (m->menu), m->associated);
 #else
+    if (m->associated) lxpanel_plugin_set_menu_icon (dhcp->panel, sel, "dialog-ok-apply");
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
 #endif
     gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
@@ -239,17 +238,13 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
     wim = g_malloc(sizeof(*wim));
     wim->scan = scan;
 #if GTK_CHECK_VERSION(3, 0, 0)
-    wim->menu = gtk_menu_item_new ();
+    wim->menu = gtk_check_menu_item_new ();
 #else
     wim->menu = gtk_image_menu_item_new();
     gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (wim->menu), TRUE);
 #endif
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
     gtk_container_add(GTK_CONTAINER(wim->menu), box);
-#if GTK_CHECK_VERSION(3, 0, 0)
-    GtkWidget *img = gtk_image_new ();
-    gtk_box_pack_start(GTK_BOX (box), img, FALSE, FALSE, 0);
-#endif
 
     wim->ssid = gtk_label_new(NULL);
 #if GTK_CHECK_VERSION(3, 0, 0)
@@ -380,11 +375,7 @@ menu_remove_if(WI_SCAN *wi, DHCPCDUIPlugin * dhcp)
         while ((children = g_list_next(children)) != NULL)
         {
             GtkWidget *item = children->data;
-#if GTK_CHECK_VERSION(3, 0, 0)
-            if (!strcmp (lxpanel_plugin_get_menu_label (item), wi->interface->ifname))
-#else
             if (!strcmp (gtk_menu_item_get_label (GTK_MENU_ITEM(item)), wi->interface->ifname))
-#endif
                 gtk_widget_destroy (GTK_WIDGET(item));
         }
         g_list_free (head);
@@ -412,12 +403,7 @@ add_scans(WI_SCAN *wi, GtkWidget *p)
     if (wi->scans == NULL)
     {
         m = gtk_menu_new ();
-#if GTK_CHECK_VERSION(3, 0, 0)
-        DHCPCDUIPlugin *dhcp = lxpanel_plugin_get_data (p);
-        wi->noap = lxpanel_plugin_new_menu_item (dhcp->panel, _("No APs found - scanning..."), 0, NULL);
-#else
         wi->noap = gtk_menu_item_new_with_label (_("No APs found - scanning..."));
-#endif
         gtk_widget_set_sensitive (wi->noap, FALSE);
         gtk_menu_shell_append(GTK_MENU_SHELL(m), wi->noap);
         return m;
@@ -578,11 +564,7 @@ menu_show (DHCPCDUIPlugin *data)
     {
         // rfkill installed, h/w found, disabled
         data->menu = gtk_menu_new ();
-#if GTK_CHECK_VERSION(3, 0, 0)
-        item = lxpanel_plugin_new_menu_item (data->panel, _("Turn On Wi-Fi"), 0, NULL);
-#else
         item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
-#endif
         g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
         gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
     }
@@ -591,11 +573,7 @@ menu_show (DHCPCDUIPlugin *data)
         if ((w = TAILQ_FIRST(&data->wi_scans)) == NULL)
         {
             data->menu = gtk_menu_new ();
-#if GTK_CHECK_VERSION(3, 0, 0)
-            item = lxpanel_plugin_new_menu_item (data->panel, _("No wireless interfaces found"), 0, NULL);
-#else
             item = gtk_menu_item_new_with_label (_("No wireless interfaces found"));
-#endif
             gtk_widget_set_sensitive (item, FALSE);
             gtk_menu_shell_append (GTK_MENU_SHELL(data->menu), item);
         }
@@ -604,18 +582,10 @@ menu_show (DHCPCDUIPlugin *data)
             if (wcountry == 0)
             {
                 data->menu = gtk_menu_new ();
-#if GTK_CHECK_VERSION(3, 0, 0)
-                item = lxpanel_plugin_new_menu_item (data->panel, _("Wi-Fi country is not set"), 0, NULL);
-#else
                 item = gtk_menu_item_new_with_label (_("Wi-Fi country is not set"));
-#endif
                 gtk_widget_set_sensitive (item, FALSE);
                 gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
-#if GTK_CHECK_VERSION(3, 0, 0)
-                item = lxpanel_plugin_new_menu_item (data->panel, _("Click here to set Wi-Fi country"), 0, NULL);
-#else
                 item = gtk_menu_item_new_with_label (_("Click here to set Wi-Fi country"));
-#endif
                 g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (set_country), NULL);
                 gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
             }
@@ -626,7 +596,7 @@ menu_show (DHCPCDUIPlugin *data)
         data->menu = gtk_menu_new();
         TAILQ_FOREACH(w, &data->wi_scans, next) {
 #if GTK_CHECK_VERSION(3, 0, 0)
-            item = lxpanel_plugin_new_menu_item (data->panel, w->interface->ifname, 0, "network-wireless");
+            item = gtk_menu_item_new_with_label (w->interface->ifname);
 #else
             item = gtk_image_menu_item_new_with_label(
                 w->interface->ifname);
@@ -638,9 +608,6 @@ menu_show (DHCPCDUIPlugin *data)
 #endif
             gtk_menu_shell_append(GTK_MENU_SHELL(data->menu), item);
             w->ifmenu = add_scans(w, data->plugin);
-#if GTK_CHECK_VERSION(3, 0, 0)
-            gtk_menu_set_reserve_toggle_size (GTK_MENU (w->ifmenu), FALSE);
-#endif
             gtk_menu_item_set_submenu(GTK_MENU_ITEM(item),
                 w->ifmenu);
         }
@@ -648,17 +615,12 @@ menu_show (DHCPCDUIPlugin *data)
         w->ifmenu = data->menu = add_scans(w, data->plugin);
     }
                 /* end original code block - retain indent for compares */
-
                 if (wifi_state == 1)
                 {
                     // rfkill installed, h/w found, enabled
                     item = gtk_separator_menu_item_new ();
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-#if GTK_CHECK_VERSION(3, 0, 0)
-                    item = lxpanel_plugin_new_menu_item (data->panel, _("Turn Off Wi-Fi"), 0, NULL);
-#else
                     item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
-#endif
                     g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
                 }
@@ -668,11 +630,7 @@ menu_show (DHCPCDUIPlugin *data)
                     // rfkill is installed, but can't control the hardware
                     item = gtk_separator_menu_item_new ();
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
-#if GTK_CHECK_VERSION(3, 0, 0)
-                    item = lxpanel_plugin_new_menu_item (data->panel, _("This Wi-Fi device cannot be turned off"), 0, NULL);
-#else
                     item = gtk_menu_item_new_with_label (_("This Wi-Fi device cannot be turned off"));
-#endif
                     gtk_widget_set_sensitive (item, FALSE);
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
                 }
@@ -683,7 +641,6 @@ menu_show (DHCPCDUIPlugin *data)
     if (data->menu) {
         gtk_widget_show_all(GTK_WIDGET(data->menu));
 #if GTK_CHECK_VERSION(3, 0, 0)
-        gtk_menu_set_reserve_toggle_size (GTK_MENU (data->menu), FALSE);
         gtk_menu_popup_at_widget (GTK_MENU(data->menu), data->plugin, GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
 #else
         gtk_menu_popup(GTK_MENU(data->menu), NULL, NULL,
