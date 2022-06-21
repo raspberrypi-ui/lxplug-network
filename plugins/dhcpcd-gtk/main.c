@@ -786,7 +786,7 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     textdomain (GETTEXT_PACKAGE);
 #endif
 
-    if (!system ("systemctl status dhcpcd | grep -qw inactive"))
+    if (!system ("systemctl status dhcpcd | grep Active: | grep -qw inactive"))
     {
         g_message ("dhcpcdui: dhcpcd service not running; plugin hidden");
         dhcp->plugin = gtk_label_new (NULL);
