@@ -731,6 +731,8 @@ static void dhcpcdui_configuration_changed (LXPanel *panel, GtkWidget *p)
     const char *icon;
     DHCPCD_WI_SCAN *s1;
 
+    if (!dhcp->tray_icon) return;
+
     if (!dhcp->ani_timer)
     {
         s1 = get_strongest_scan (p);
@@ -783,6 +785,15 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
 #endif
+
+    if (system ("systemctl status dhcpcd | grep -qw active"))
+    {
+        g_message ("dhcpcdui: dhcpcd service not running; plugin hidden");
+        dhcp->plugin = gtk_label_new (NULL);
+        dhcp->tray_icon = NULL;
+        lxpanel_plugin_set_data (dhcp->plugin, dhcp, dhcpcdui_destructor);
+        return dhcp->plugin;
+    }
 
     dhcp->tray_icon = gtk_image_new ();
     lxpanel_plugin_set_taskbar_icon (panel, dhcp->tray_icon, "network-offline");
