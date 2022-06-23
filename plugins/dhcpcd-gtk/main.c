@@ -699,6 +699,24 @@ bgscan(gpointer data)
     return TRUE;
 }
 
+static int check_service (char *name)
+{
+    int res;
+    char *buf;
+
+    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -qw Active:", name);
+    res = system (buf);
+    g_free (buf);
+
+    if (res) return 0;
+
+    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -w Active: | grep -qw inactive", name);
+    res = system (buf);
+    g_free (buf);
+
+    return res;
+}
+
 static gboolean dhcpcdui_button_press_event (GtkWidget *widget, GdkEventButton *event, LXPanel *panel)
 {
     DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (widget);
@@ -786,7 +804,7 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     textdomain (GETTEXT_PACKAGE);
 #endif
 
-    if (!system ("systemctl status dhcpcd | grep Active: | grep -qw inactive"))
+    if (!check_service ("dhcpcd"))
     {
         g_message ("dhcpcdui: dhcpcd service not running; plugin hidden");
         dhcp->plugin = gtk_label_new (NULL);
