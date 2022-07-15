@@ -372,11 +372,6 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con,
     bool refresh;
     WI_SCAN *w;
 
-#ifdef ENABLE_NLS
-    // need to rebind here for tooltip update
-    textdomain ( GETTEXT_PACKAGE );
-#endif
-
     g_message(_("Status changed to %s"), status_msg);
     if (status == DHC_DOWN) {
         msg = N_(last == DHC_UNKNOWN ?
@@ -721,9 +716,6 @@ static gboolean dhcpcdui_button_press_event (GtkWidget *widget, GdkEventButton *
 {
     DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (widget);
 
-#ifdef ENABLE_NLS
-    textdomain ( GETTEXT_PACKAGE );
-#endif
     /* Show or hide the popup menu on left-click */
     if (event->button == 1)
     {
@@ -737,9 +729,8 @@ static GtkWidget *dhcpcdui_configure (LXPanel *panel, GtkWidget *p)
 {
     DHCPCDUIPlugin * dhcp = lxpanel_plugin_get_data (p);
 
-#ifdef ENABLE_NLS
-    textdomain ( GETTEXT_PACKAGE );
-#endif
+    if (!dhcp->tray_icon) return NULL;
+
     return prefs_show (dhcp);
 }
 
@@ -801,7 +792,6 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     setlocale (LC_ALL, "");
     bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-    textdomain (GETTEXT_PACKAGE);
 #endif
 
     if (!check_service ("dhcpcd"))

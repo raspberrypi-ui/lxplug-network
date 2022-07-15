@@ -3,3 +3,6 @@ plugins/dhcpcd-gtk/main.c
 plugins/dhcpcd-gtk/menu.c
 plugins/dhcpcd-gtk/prefs.c
 plugins/dhcpcd-gtk/wpa.c
+plugins/libdhcpcd/config.c
+plugins/libdhcpcd/dhcpcd.c
+plugins/libdhcpcd/wpa.c

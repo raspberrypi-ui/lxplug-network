@@ -50,7 +50,7 @@
 
 #ifdef HAS_GETTEXT
 #include <libintl.h>
-#define _ gettext
+#define _(a) dgettext(GETTEXT_PACKAGE,a)
 #else
 #define _(a) (a)
 #endif
@@ -1221,11 +1221,6 @@ dhcpcd_if_message(DHCPCD_IF *i, bool *new_msg)
 	const char *reason = NULL;
 	size_t len;
 	bool showssid;
-
-#ifdef ENABLE_NLS
-    // need to rebind here for tooltip update
-    textdomain ( GETTEXT_PACKAGE );
-#endif
 
 	assert(i);
 	/* Don't report non SLAAC configurations */

@@ -27,6 +27,8 @@
 #ifndef DHCPCD_GTK_H
 #define DHCPCD_GTK_H
 
+#include <config.h>
+
 #include <stdbool.h>
 
 #include <glib.h>
