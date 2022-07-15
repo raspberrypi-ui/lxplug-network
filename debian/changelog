@@ -1,3 +1,9 @@
+lxplug-network (0.31) bullseye; urgency=medium
+
+  * Fix for crash when accessing preferences when hidden
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 15 Jul 2022 11:21:14 +0100
+
 lxplug-network (0.30) bullseye; urgency=medium
 
   * Check for dhcpcd service before loading plugin
