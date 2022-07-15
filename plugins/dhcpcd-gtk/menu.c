@@ -94,6 +94,8 @@ static void disconnect_prompt (DHCPCDUIPlugin *dhcp)
     GtkBuilder *builder;
     char *buffer;
 
+    textdomain (GETTEXT_PACKAGE);
+
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/ui/lxpanel-modal.ui");
 
     dhcp->disc_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
