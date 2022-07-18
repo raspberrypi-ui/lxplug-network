@@ -740,7 +740,11 @@ static void dhcpcdui_configuration_changed (LXPanel *panel, GtkWidget *p)
     const char *icon;
     DHCPCD_WI_SCAN *s1;
 
-    if (!dhcp->tray_icon) return;
+    if (!dhcp->active)
+    {
+        gtk_widget_hide (dhcp->plugin);
+        return;
+    }
 
     if (!dhcp->ani_timer)
     {
@@ -784,8 +788,7 @@ static void dhcpcdui_destructor (gpointer user_data)
 static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settings)
 {
     /* Allocate and initialize plugin context */
-    DHCPCDUIPlugin * dhcp = g_new0 (DHCPCDUIPlugin, 1);
-    GtkWidget *p;
+    DHCPCDUIPlugin *dhcp = g_new0 (DHCPCDUIPlugin, 1);
     int val;
 
 #ifdef ENABLE_NLS
@@ -794,77 +797,79 @@ static GtkWidget *dhcpcdui_constructor (LXPanel *panel, config_setting_t *settin
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 #endif
 
-    if (!check_service ("dhcpcd"))
-    {
-        g_message ("dhcpcdui: dhcpcd service not running; plugin hidden");
-        dhcp->plugin = gtk_label_new (NULL);
-        dhcp->tray_icon = NULL;
-        lxpanel_plugin_set_data (dhcp->plugin, dhcp, dhcpcdui_destructor);
-        return dhcp->plugin;
-    }
-
-    dhcp->tray_icon = gtk_image_new ();
-    lxpanel_plugin_set_taskbar_icon (panel, dhcp->tray_icon, "network-offline");
-    gtk_widget_set_tooltip_text (dhcp->tray_icon, _("Connecting to dhcpcd ..."));
-    gtk_widget_set_visible (dhcp->tray_icon, true);
-
-    dhcp->online = false;
-
-    TAILQ_INIT(&dhcp->wi_scans);
-    g_message(_("Connecting ..."));
-    dhcp->con = dhcpcd_new ();
-    if (dhcp->con ==  NULL)
-    {
-        g_critical ("libdhcpcd: %s", strerror(errno));
-        return NULL;
-    }
-    dhcpcd_set_progname (dhcp->con, "dhcpcd-gtk");
-
-    /* Allocate top level widget and set into Plugin widget pointer. */
+    /* Allocate top level widget and set into plugin widget pointer. */
     dhcp->panel = panel;
-    dhcp->plugin = p = gtk_button_new ();
-    gtk_button_set_relief (GTK_BUTTON (dhcp->plugin), GTK_RELIEF_NONE);
-    g_signal_connect (dhcp->plugin, "button-press-event", G_CALLBACK(dhcpcdui_button_press_event), NULL);
     dhcp->settings = settings;
-    lxpanel_plugin_set_data (p, dhcp, dhcpcdui_destructor);
-    gtk_widget_add_events (p, GDK_BUTTON_PRESS_MASK);
+    dhcp->plugin = gtk_button_new ();
+    lxpanel_plugin_set_data (dhcp->plugin, dhcp, dhcpcdui_destructor);
 
     /* Allocate icon as a child of top level */
-    gtk_container_add (GTK_CONTAINER(p), dhcp->tray_icon);
+    dhcp->tray_icon = gtk_image_new ();
+    gtk_container_add (GTK_CONTAINER (dhcp->plugin), dhcp->tray_icon);
+    lxpanel_plugin_set_taskbar_icon (panel, dhcp->tray_icon, "network-offline");
+    gtk_widget_set_tooltip_text (dhcp->tray_icon, _("Connecting to dhcpcd ..."));
 
-    /* Setup callbacks */
-    dhcpcd_set_status_callback (dhcp->con, dhcpcd_status_cb, dhcp);
-    dhcpcd_set_if_callback (dhcp->con, dhcpcd_if_cb, dhcp);
-    dhcpcd_wpa_set_scan_callback (dhcp->con, dhcpcd_wpa_scan_cb, dhcp);
-    dhcpcd_wpa_set_status_callback (dhcp->con, dhcpcd_wpa_status_cb, dhcp);
-    if (dhcpcd_try_open (dhcp))
-        dhcp->reopen_timer = g_timeout_add (DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
+    /* Set up button */
+    gtk_button_set_relief (GTK_BUTTON (dhcp->plugin), GTK_RELIEF_NONE);
 
-    if (config_setting_lookup_int (settings, "BgScan", &val))
+    if (!check_service ("dhcpcd"))
     {
-        dhcp->nomenu_scan_timer = val * 1000;
+        dhcp->active = FALSE;
+        g_message ("dhcpcdui: dhcpcd service not running; plugin hidden");
     }
-    else dhcp->nomenu_scan_timer = DHCPCD_WPA_SCAN_LONG;
-
-    if (config_setting_lookup_int (settings, "BgScanMenu", &val))
+    else
     {
-        dhcp->menu_scan_timer = val * 1000;
+        dhcp->active = TRUE;
+
+        dhcp->online = false;
+
+        dhcp->dialog = NULL;
+        dhcp->wpa_err = NULL;
+        dhcp->wpa_dialog = NULL;
+        dhcp->menu = NULL;
+
+        /* Connect to dhcpcd */
+        TAILQ_INIT (&dhcp->wi_scans);
+        g_message (_("Connecting ..."));
+        dhcp->con = dhcpcd_new ();
+        if (dhcp->con == NULL)
+        {
+            g_message ("libdhcpcd fail: %s", strerror (errno));
+            dhcp->active = FALSE;
+        }
+        else
+        {
+            dhcpcd_set_progname (dhcp->con, "dhcpcd-gtk");
+
+            /* Set up callbacks */
+            dhcpcd_set_status_callback (dhcp->con, dhcpcd_status_cb, dhcp);
+            dhcpcd_set_if_callback (dhcp->con, dhcpcd_if_cb, dhcp);
+            dhcpcd_wpa_set_scan_callback (dhcp->con, dhcpcd_wpa_scan_cb, dhcp);
+            dhcpcd_wpa_set_status_callback (dhcp->con, dhcpcd_wpa_status_cb, dhcp);
+
+            /* Set up timers */
+            if (dhcpcd_try_open (dhcp))
+                dhcp->reopen_timer = g_timeout_add (DHCPCD_RETRYOPEN, dhcpcd_try_open, dhcp);
+
+            if (config_setting_lookup_int (settings, "BgScan", &val))
+                dhcp->nomenu_scan_timer = val * 1000;
+            else
+                dhcp->nomenu_scan_timer = DHCPCD_WPA_SCAN_LONG;
+
+            if (config_setting_lookup_int (settings, "BgScanMenu", &val))
+                dhcp->menu_scan_timer = val * 1000;
+            else
+                dhcp->menu_scan_timer = DHCPCD_WPA_SCAN_SHORT;
+
+            /* Start background scanning */
+            if (dhcp->nomenu_scan_timer > 0)
+                dhcp->defscan_timer = g_timeout_add (dhcp->nomenu_scan_timer, bgscan, dhcp);
+        }
     }
-    else dhcp->menu_scan_timer = DHCPCD_WPA_SCAN_SHORT;
-
-    /* Start background scanning */
-    if (dhcp->nomenu_scan_timer > 0)
-        dhcp->defscan_timer = g_timeout_add (dhcp->nomenu_scan_timer, bgscan, dhcp);
-
-    /* Null dialog pointers so they don't get closed when they don't exist...*/
-    dhcp->dialog = NULL;
-    dhcp->wpa_err = NULL;
-    dhcp->wpa_dialog = NULL;
-    dhcp->menu = NULL;
 
     /* Show the widget, and return. */
-    gtk_widget_show_all (p);
-    return p;
+    gtk_widget_show_all (dhcp->plugin);
+    return dhcp->plugin;
 }
 
 FM_DEFINE_MODULE(lxpanel_gtk, dhcpcdui)

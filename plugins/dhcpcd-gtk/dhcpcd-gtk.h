@@ -89,6 +89,7 @@ typedef struct {
     LXPanel *panel;                 /* Back pointer to panel */
     GtkWidget *tray_icon;           /* Displayed image */
     config_setting_t *settings;     /* Plugin settings */
+    gboolean active;
 
     DHCPCD_CONNECTION *con;         /* Global connection data */
 
