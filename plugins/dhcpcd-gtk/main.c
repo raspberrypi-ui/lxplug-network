@@ -611,7 +611,6 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, gpointer p)
         TAILQ_INSERT_TAIL(&dhcp->wi_scans, w, next);
     } else {
 		if (!i->up) {
-			char *txt, *t;
 
 			txt = NULL;
 			msg = N_("New Access Point");

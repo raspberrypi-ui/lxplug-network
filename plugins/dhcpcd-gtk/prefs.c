@@ -646,14 +646,9 @@ prefs_show(DHCPCDUIPlugin *dhcp)
         _("Disable IPv6"));
     g_signal_connect(G_OBJECT(dhcp->noipv6), "toggled", G_CALLBACK(ipv6_toggle), dhcp);
     gtk_box_pack_start(GTK_BOX(vbox), dhcp->noipv6, false, false, 3);
-#if GTK_CHECK_VERSION(3, 0, 0)
     table = gtk_grid_new ();
-#else
-    table = gtk_table_new(6, 2, false);
-#endif
     gtk_box_pack_start(GTK_BOX(dhcp->controls), table, false, false, 0);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
 #define attach_label(a, b, c, d, e)                       \
     do {                                      \
         gtk_label_set_xalign (GTK_LABEL(a), 0.0); \
@@ -661,17 +656,6 @@ prefs_show(DHCPCDUIPlugin *dhcp)
     } while (0)
 #define attach_entry(a, b, c, d, e)                       \
     gtk_grid_attach(GTK_GRID(table), a, b, d, c - b, e - d);
-#else
-#define attach_label(a, b, c, d, e)                       \
-    do {                                      \
-        gtk_misc_set_alignment(GTK_MISC(a), 0.0, 0.5);            \
-        gtk_table_attach(GTK_TABLE(table), a, b, c, d, e,         \
-            GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 3, 3);      \
-    } while (0)
-#define attach_entry(a, b, c, d, e)                       \
-    gtk_table_attach(GTK_TABLE(table), a, b, c, d, e,             \
-        GTK_EXPAND | GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 3, 3);
-#endif
 
     w = gtk_label_new(_("IPv4 Address:"));
     dhcp->address = gtk_entry_new();
@@ -709,28 +693,14 @@ prefs_show(DHCPCDUIPlugin *dhcp)
     attach_label(w, 0, 1, 4, 5);
     attach_entry(dhcp->dns_search, 1, 2, 4, 5);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
     dhcp->clear = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), _("C_lear"), 1);
     gtk_button_set_image (GTK_BUTTON(dhcp->clear), gtk_image_new_from_icon_name ("gtk-clear", GTK_ICON_SIZE_BUTTON));
-#else
-    dhcp->clear = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_CLEAR, 1);
-    gtk_button_set_label (GTK_BUTTON(dhcp->clear), _("C_lear"));
-    gtk_button_set_image (GTK_BUTTON(dhcp->clear), gtk_image_new_from_stock (GTK_STOCK_CLEAR, GTK_ICON_SIZE_BUTTON));
-#endif
     gtk_widget_set_sensitive(dhcp->clear, false);
     g_signal_connect(G_OBJECT(dhcp->clear), "clicked", G_CALLBACK (on_clear), dhcp);
-#if GTK_CHECK_VERSION(3, 0, 0)
     dhcp->rebind = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), _("_Apply"), 1);
-#else
-    dhcp->rebind = gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_APPLY, 1);
-#endif
     gtk_widget_set_sensitive(dhcp->rebind, false);
     g_signal_connect(G_OBJECT(dhcp->rebind), "clicked", G_CALLBACK (on_rebind), dhcp);
-#if GTK_CHECK_VERSION(3, 0, 0)
     gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), _("_Close"), GTK_RESPONSE_CLOSE);
-#else
-    gtk_dialog_add_button (GTK_DIALOG(dhcp->dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
-#endif
 
     blocks_on_change(dhcp->blocks, dhcp);
     show_config(NULL, dhcp);

@@ -192,20 +192,12 @@ get_security_icon(unsigned int flags, const char **icon)
 static void
 update_item(WI_SCAN *wi, WI_MENU *m, DHCPCD_WI_SCAN *scan, DHCPCDUIPlugin *dhcp)
 {
-    const char *icon;
-    GtkWidget *sel = gtk_image_new ();
-
     m->scan = scan;
 
     g_object_set_data(G_OBJECT(m->menu), "dhcpcd_wi_scan", scan);
 
     m->associated = is_associated(wi, scan);
-#if GTK_CHECK_VERSION(3, 0, 0)
     gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (m->menu), m->associated);
-#else
-    if (m->associated) lxpanel_plugin_set_menu_icon (dhcp->panel, sel, "dialog-ok-apply");
-    gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM(m->menu), sel);
-#endif
     gtk_label_set_text (GTK_LABEL(m->ssid), scan->ssid);
 
     //m->icon = gtk_image_new ();
@@ -239,21 +231,12 @@ create_menu(WI_SCAN *wis, DHCPCD_WI_SCAN *scan, GtkWidget *p)
 
     wim = g_malloc(sizeof(*wim));
     wim->scan = scan;
-#if GTK_CHECK_VERSION(3, 0, 0)
     wim->menu = gtk_check_menu_item_new ();
-#else
-    wim->menu = gtk_image_menu_item_new();
-    gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (wim->menu), TRUE);
-#endif
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
     gtk_container_add(GTK_CONTAINER(wim->menu), box);
 
     wim->ssid = gtk_label_new(NULL);
-#if GTK_CHECK_VERSION(3, 0, 0)
     gtk_label_set_xalign (GTK_LABEL (wim->ssid), 0.0);
-#else
-    gtk_misc_set_alignment(GTK_MISC(wim->ssid), 0.0, 0.5);
-#endif
     gtk_box_pack_start(GTK_BOX(box), wim->ssid, TRUE, TRUE, 0);
 
     wim->freq = gtk_image_new ();
@@ -498,15 +481,6 @@ menu_bgscan(gpointer data)
     return TRUE;
 }
 
-static void dhcpcdui_popup_set_position(GtkMenu * menu, gint * px, gint * py, gboolean * push_in, gpointer data)
-{
-    DHCPCDUIPlugin * dhcp = (DHCPCDUIPlugin *) data;
-
-    /* Determine the coordinates. */
-    lxpanel_plugin_popup_set_position_helper(dhcp->panel, dhcp->plugin, GTK_WIDGET(menu), px, py);
-    *push_in = TRUE;
-}
-
 static int wifi_enabled (void)
 {
     FILE *fp;
@@ -552,7 +526,7 @@ void
 menu_show (DHCPCDUIPlugin *data)
 {
     WI_SCAN *w, *l;
-    GtkWidget *item, *image;
+    GtkWidget *item;
 
     //sicon = icon;
     notify_close();
@@ -597,17 +571,7 @@ menu_show (DHCPCDUIPlugin *data)
     if ((l = TAILQ_LAST(&data->wi_scans, wi_scan_head)) && l != w) {
         data->menu = gtk_menu_new();
         TAILQ_FOREACH(w, &data->wi_scans, next) {
-#if GTK_CHECK_VERSION(3, 0, 0)
             item = gtk_menu_item_new_with_label (w->interface->ifname);
-#else
-            item = gtk_image_menu_item_new_with_label(
-                w->interface->ifname);
-            gtk_image_menu_item_set_always_show_image (GTK_IMAGE_MENU_ITEM (item), TRUE);
-            image = gtk_image_new ();
-            lxpanel_plugin_set_menu_icon (data->panel, image, "network-wireless");
-            gtk_image_menu_item_set_image(
-                GTK_IMAGE_MENU_ITEM(item), image);
-#endif
             gtk_menu_shell_append(GTK_MENU_SHELL(data->menu), item);
             w->ifmenu = add_scans(w, data->plugin);
             gtk_menu_item_set_submenu(GTK_MENU_ITEM(item),
@@ -642,13 +606,7 @@ menu_show (DHCPCDUIPlugin *data)
 
     if (data->menu) {
         gtk_widget_show_all(GTK_WIDGET(data->menu));
-#if GTK_CHECK_VERSION(3, 0, 0)
         gtk_menu_popup_at_widget (GTK_MENU(data->menu), data->plugin, GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST, NULL);
-#else
-        gtk_menu_popup(GTK_MENU(data->menu), NULL, NULL,
-            dhcpcdui_popup_set_position, data,
-            1, gtk_get_current_event_time());
-#endif
 
     if (data->menu_scan_timer > 0)
         data->bgscan_timer = g_timeout_add (data->menu_scan_timer,

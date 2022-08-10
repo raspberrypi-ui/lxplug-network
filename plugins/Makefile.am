@@ -31,7 +31,8 @@ dhcpcdui_la_CFLAGS = \
 	-I$(srcdir)/dhcpcd-gtk \
 	-I$(srcdir)/libdhcpcd \
 	$(PACKAGE_CFLAGS) \
-	$(G_CAST_CHECKS)
+	$(G_CAST_CHECKS) \
+	-Wall
 
 dhcpcdui_la_LDFLAGS = \
 	$(PACKAGE_LIBS) \
