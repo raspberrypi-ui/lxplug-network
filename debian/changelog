@@ -1,6 +1,7 @@
 lxplug-network (0.31) bullseye; urgency=medium
 
   * Fix for crash when accessing preferences when hidden
+  * Add control message to launch menu
 
  -- Simon Long <simon@raspberrypi.com>  Fri, 15 Jul 2022 11:21:14 +0100
 
