@@ -758,6 +758,19 @@ static void dhcpcdui_configuration_changed (LXPanel *panel, GtkWidget *p)
     }
 }
 
+/* Handler for control message */
+static gboolean dhcpcdui_control_msg (GtkWidget *plugin, const char *cmd)
+{
+    DHCPCDUIPlugin *dhcp = lxpanel_plugin_get_data (plugin);
+
+    if (!g_strcmp0 (cmd, "menu"))
+    {
+        menu_show (dhcp);
+    }
+
+    return TRUE;
+}
+
 /* Plugin destructor. */
 static void dhcpcdui_destructor (gpointer user_data)
 {
@@ -881,5 +894,6 @@ LXPanelPluginInit fm_module_init_lxpanel_gtk = {
     .config = dhcpcdui_configure,
     .reconfigure = dhcpcdui_configuration_changed,
     .button_press_event = dhcpcdui_button_press_event,
+    .control = dhcpcdui_control_msg,
     .gettext_package = GETTEXT_PACKAGE
 };

@@ -117,7 +117,7 @@ msgstr "Click here to set wireless LAN country"
 
 #: ../plugins/dhcpcd-gtk/menu.c:555
 msgid "Turn On Wi-Fi"
-msgstr "Turn On Wireless LAN"
+msgstr "_Turn On Wireless LAN"
 
 #: ../plugins/dhcpcd-gtk/menu.c:565
 msgid "No wireless interfaces found"
@@ -125,7 +125,7 @@ msgstr "No wireless LAN interfaces found"
 
 #: ../plugins/dhcpcd-gtk/menu.c:595
 msgid "Turn Off Wi-Fi"
-msgstr "Turn Off Wireless LAN"
+msgstr "_Turn Off Wireless LAN"
 
 #: ../plugins/dhcpcd-gtk/menu.c:604
 msgid "This Wi-Fi device cannot be turned off"

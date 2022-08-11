@@ -541,6 +541,7 @@ menu_show (DHCPCDUIPlugin *data)
         // rfkill installed, h/w found, disabled
         data->menu = gtk_menu_new ();
         item = gtk_menu_item_new_with_label (_("Turn On Wi-Fi"));
+        gtk_menu_item_set_use_underline (GTK_MENU_ITEM (item), TRUE);
         g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
         gtk_menu_shell_append (GTK_MENU_SHELL (data->menu), item);
     }
@@ -587,6 +588,7 @@ menu_show (DHCPCDUIPlugin *data)
                     item = gtk_separator_menu_item_new ();
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
                     item = gtk_menu_item_new_with_label (_("Turn Off Wi-Fi"));
+                    gtk_menu_item_set_use_underline (GTK_MENU_ITEM (item), TRUE);
                     g_signal_connect (G_OBJECT(item), "activate", G_CALLBACK (toggle_wifi), NULL);
                     gtk_menu_shell_prepend (GTK_MENU_SHELL (data->menu), item);
                 }
