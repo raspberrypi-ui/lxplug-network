@@ -56,28 +56,9 @@ static void set_country (_unused GObject *o, _unused gpointer data)
 {
     if (fork () == 0)
     {
-        // clone the existing environment
-        extern char **environ;
-        char **env = malloc (sizeof (environ) + sizeof (char *));
-        int index = 0;
-        while (environ[index])
-        {
-            env[index] = g_strdup (environ[index]);
-            index++;
-        }
-
-        // add the new variable to the cloned environment
-        env[index++] = g_strdup ("SUDO_ASKPASS=/usr/lib/rc-gui/pwdrcg.sh");
-        env[index] = NULL;
-
-        // run the command
+        setenv ("SUDO_ASKPASS", "/usr/lib/rc-gui/pwdrcg.sh", 1);
         char *args[] = { "sudo", "-AE", "rc_gui", "-w", NULL };
-        execvpe ("sudo", args, env);
-
-        // free the cloned environment
-        index = 0;
-        while (env[index]) g_free (env[index]);
-        g_free (env);
+        execvp ("sudo", args);
     }
 }
 
