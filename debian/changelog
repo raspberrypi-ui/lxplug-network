@@ -1,3 +1,9 @@
+lxplug-network (0.32) bullseye; urgency=medium
+
+  * Faster service check at start
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 21 Sep 2022 13:53:02 +0100
+
 lxplug-network (0.31) bullseye; urgency=medium
 
   * Fix for crash when accessing preferences when hidden
