@@ -1,0 +1,268 @@
+# English translations for lxplug_dhcpcdui package.
+# Copyright (C) 2018 Raspberry Pi Ltd
+# This file is distributed under the same license as the lxplug_dhcpcdui package.
+# Simon Long <simon@raspberrypi.org>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lxplug_dhcpcdui 0.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-07-12 15:06+0100\n"
+"PO-Revision-Date: 2023-05-22 09:57+0900\n"
+"Language-Team: English (British)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 2.4.2\n"
+"Last-Translator: Yi Yunseok <ironyunseok@protonmail.com>\n"
+"Language: ko\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:368
+msgid "Error creating new GIO Channel\n"
+msgstr "새 GIO 채널 생성 중 오류\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:373
+msgid "Error creating watch\n"
+msgstr "워치 생성 중 오류\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:380
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../plugins/dhcpcd-gtk/main.c:411
+#, c-format
+msgid "Status changed to %s"
+msgstr "%s(으)로 상태 변경됨"
+
+#: ../plugins/dhcpcd-gtk/main.c:414
+msgid "Connection to dhcpcd lost"
+msgstr "프로토콜(dhcpcd)에 대한 연결이 끊어짐"
+
+#: ../plugins/dhcpcd-gtk/main.c:414
+msgid "dhcpcd not running"
+msgstr "프로토콜(dhcpcd)이 실행되지 않음"
+
+#: ../plugins/dhcpcd-gtk/main.c:436
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "%s-%s(으)로 연결됨"
+
+#: ../plugins/dhcpcd-gtk/main.c:454
+msgid "dhcpcd connection lost"
+msgstr "프로토콜(dhcpcd) 연결이 끊어짐"
+
+#: ../plugins/dhcpcd-gtk/main.c:524
+msgid "Network event"
+msgstr "네트워크 이벤트"
+
+#: ../plugins/dhcpcd-gtk/main.c:566
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "프로토콜(dhcpcd) WPA 연결이 끊어짐: %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:628
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: 받은 스캔 결과"
+
+#: ../plugins/dhcpcd-gtk/main.c:653
+msgid "New Access Point"
+msgstr "새 액세스 포인트"
+
+#: ../plugins/dhcpcd-gtk/main.c:662
+msgid "New Access Points"
+msgstr "새 액세스 포인트"
+
+#: ../plugins/dhcpcd-gtk/main.c:699
+#, c-format
+msgid "%s: WPA status %s"
+msgstr "%s: WPA 상태 %s"
+
+#: ../plugins/dhcpcd-gtk/main.c:819
+msgid "Connecting to dhcpcd ..."
+msgstr "프로토콜(dhcpcd) 연결 중..."
+
+#: ../plugins/dhcpcd-gtk/main.c:825
+msgid "Connecting ..."
+msgstr "연결 중..."
+
+#: ../plugins/dhcpcd-gtk/main.c:866
+msgid "Wireless & Wired Network"
+msgstr "유무선 네트워크"
+
+#: ../plugins/dhcpcd-gtk/main.c:867
+msgid "Control for dhcpcd network interface"
+msgstr "프로토콜(dhcpcd) 네트워크 인터페이스 제어"
+
+#: ../plugins/dhcpcd-gtk/menu.c:85
+#, c-format
+msgid "Do you want to disconnect from the Wi-Fi network '%s'?"
+msgstr "'%s' 와이파이 네트워크 연결을 해제하시겠습니까?"
+
+#: ../plugins/dhcpcd-gtk/menu.c:86
+msgid "Disconnect Wi-Fi Network"
+msgstr "와이파이 네트워크 연결 해제"
+
+#: ../plugins/dhcpcd-gtk/menu.c:383
+msgid "No APs found - scanning..."
+msgstr "AP를 찾을 수 없음 - 스캔 중..."
+
+#: ../plugins/dhcpcd-gtk/menu.c:546
+msgid "Wi-Fi country is not set"
+msgstr "와이파이 국가가 설정되지 않음"
+
+#: ../plugins/dhcpcd-gtk/menu.c:549
+msgid "Click here to set Wi-Fi country"
+msgstr "와이파이 국가 설정을 하려면 클릭"
+
+#: ../plugins/dhcpcd-gtk/menu.c:555
+msgid "Turn On Wi-Fi"
+msgstr "와이파이 켜기"
+
+#: ../plugins/dhcpcd-gtk/menu.c:565
+msgid "No wireless interfaces found"
+msgstr "무선 인터페이스를 찾을 수 없음"
+
+#: ../plugins/dhcpcd-gtk/menu.c:595
+msgid "Turn Off Wi-Fi"
+msgstr "와이파이 끄기"
+
+#: ../plugins/dhcpcd-gtk/menu.c:604
+msgid "This Wi-Fi device cannot be turned off"
+msgstr "이 와이파이 장치를 끌 수 없음"
+
+#: ../plugins/dhcpcd-gtk/menu.c:682
+msgid "_Preferences"
+msgstr "기본 설정(_P)"
+
+#: ../plugins/dhcpcd-gtk/menu.c:696
+msgid "_About"
+msgstr "정보(_A)"
+
+#: ../plugins/dhcpcd-gtk/menu.c:704
+msgid "_Quit"
+msgstr "종료(_Q)"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error saving"
+msgstr "저장 오류"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:51
+msgid "Error reading"
+msgstr "읽기 오류"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:55
+msgid "Config error"
+msgstr "설정 오류"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:574
+msgid "Network Preferences"
+msgstr "네트워크 기본 설정"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:586
+msgid "Configure:"
+msgstr "구성:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:632
+msgid "Automatically configure empty options"
+msgstr "빈 항목 자동 구성"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:635
+msgid "Disable IPv6"
+msgstr "IPv6 비활성"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:651
+msgid "IPv4 Address:"
+msgstr "IPv4 주소:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:659
+msgid "IPv6 Address:"
+msgstr "IPv6 주소:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:667
+msgid "Router:"
+msgstr "라우터:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:675
+msgid "DNS Servers:"
+msgstr "DNS 서버:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:682
+msgid "DNS Search:"
+msgstr "DNS 검색:"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:688
+msgid "C_lear"
+msgstr "비우기(_L)"
+
+#: ../plugins/dhcpcd-gtk/prefs.c:703
+msgid "The dhcpcd configuration file is not writeable"
+msgstr "프로토콜(dhcpcd) 구성 파일을 작성할 수 없음"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "연결 해제에 실패했습니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:79
+msgid "Failed to reconfigure."
+msgstr "재구성에 실패했습니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "키 관리 설정에 실패했습니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "비밀번호가 너무 짧습니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "네트워크 활성에 실패했습니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "네트워크 선택에 실패했습니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "연결을 시작하지 못했습니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"보안 표준(wpa_supplicant) 구성 저장에 실패했습니다.\n"
+"\n"
+"/etc/wpa_supplicant.conf 파일에 update_config=1 명령을 추가해야 합니다."
+
+#: ../plugins/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "네트워크 활성화 오류"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113 ../plugins/dhcpcd-gtk/wpa.c:118
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Error disconnecting network"
+msgstr "네트워크 연결 해제 실패"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:113
+msgid "Could not find SSID to disconnect"
+msgstr "연결 해제할 SSID를 찾을 수 없음"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:118
+msgid "Could not remove network"
+msgstr "네트워크를 제거할 수 없음"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:123
+msgid "Could not write configuration"
+msgstr "구성을 작성할 수 없음"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:205
+msgid "Pre Shared Key:"
+msgstr "사전 공유 키:"
+
+#: ../plugins/dhcpcd-gtk/wpa.c:219
+msgid "Hide characters"
+msgstr "문자 숨기기"
