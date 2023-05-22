@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: lxplug_dhcpcdui 0.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-12 15:06+0100\n"
-"PO-Revision-Date: 2023-05-21 09:05+0900\n"
+"PO-Revision-Date: 2023-05-22 09:45+0900\n"
 "Language-Team: English (British)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -194,7 +194,7 @@ msgstr "DNS 검색:"
 
 #: ../plugins/dhcpcd-gtk/prefs.c:688
 msgid "C_lear"
-msgstr "C_lear"
+msgstr "비우기(_L)"
 
 #: ../plugins/dhcpcd-gtk/prefs.c:703
 msgid "The dhcpcd configuration file is not writeable"
